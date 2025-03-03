@@ -1,5 +1,5 @@
 ---
-title: "Dynamic Systems Simulation and Modelling With R, ctsem, and lme4: Couples' Affective Dynamics Over Time"
+title: "Dynamic Systems Simulation and Modelling With R, ctsem, and lme4: Couples' Affect Dynamics Over Time"
 shorttitle: "Dynamic Systems Simulation and Modelling in R"
 author:
   - name: Charles C. Driver
@@ -7,15 +7,14 @@ author:
     orcid: 0000-0002-4174-2970
     email: charles.driver@psychologie.uzh.ch
     affiliations:
+        
       - name: University of Zurich
         department: Department of Psychology
         address: Binzmühlestrasse 14, Box 28
         region: Zurich
         postal-code: 8057
-        
-abstract: "Understanding how people change is a fundamental goal of psychological science. However, translating complex ideas about psychological dynamics into formal models can be challenging without the right tools. In this tutorial, we introduce a pipeline that leverages R and the ctsem package to help researchers build and understand dynamic systems models that capture the complexity of psychological processes. Our workflow emphasizes iterative model-building through simulations, model fitting, and visualizations of the model-implied dynamics alongside their fit to data. We begin with familiar linear models in lme4 and gradually transition to ctsem, which allows us to incorporate complexities such as state-dependent change, the distinction between random fluctuation and measurement error, covariate effects, interactions, and external inputs. These modeling concepts are illustrated using a running example of affective dynamics in couples therapy, demonstrating how key conceptual and methodological ideas in dynamic systems modeling are integrated. Our aim is to provide a general framework for understanding dynamic systems modeling and to encourage further exploration of theory-driven statistical approaches in psychological research."
-
-keywords: [Dynamic systems, Continuous time, Hierarchical modeling,Longitudinal data analysis, Affective dynamics, ctsem, lme4, State-space models]
+abstract: "Understanding how people change is a fundamental goal of psychological science. However, translating complex ideas about psychological dynamics into formal models can be challenging without the right tools. In this tutorial, we introduce a workflow that leverages R and the ctsem package to help researchers build and understand dynamic systems models that capture the complexity of psychological processes. Our workflow emphasizes iterative model-building through simulations, model fitting, and visualizations of the model-implied dynamics alongside their fit to data. We begin with familiar linear models in lme4 and gradually transition to ctsem, which allows us to incorporate complexities such as state-dependent change, random fluctuation that are distinct from measurement error, covariate effects, interactions, and external inputs. These modeling concepts are illustrated using a running example of affect dynamics in couples therapy, demonstrating how key conceptual and methodological ideas in dynamic systems modeling come together. Our aim is to provide a general framework for understanding dynamic systems modeling and to encourage further exploration of theory-driven statistical approaches in psychological research."
+keywords: [dynamic systems, continuous time, hierarchical modeling, longitudinal data analysis, affect dynamics, ctsem, lme4, state-space models]
 author-note:
   disclosures:
     conflict of interest: The author has no conflict of interest to declare.
@@ -70,32 +69,32 @@ texdir='./tex'
 
 # Introduction
 
-Dynamic systems theory introduces a set of principles about temporal dynamics that allow researchers to think about how psychological constructs unfold over time. Multiple subfields of psychology have shown interest in representing psychological processes as dynamic systems (REFs). Here we aim to improve the ability of psychological researchers to adopt appropriate methods to translate conceptual ideas about dynamic systems into empirically testable statistical models in R using lme4 [@bates2015fitting] and ctsem [@driver2018hierarchical].
+Dynamic systems theory provides a framework for understanding how psychological constructs evolve over time (REFs). By modeling temporal dynamics, researchers can gain deeper insights into the mechanisms that drive change in behavioral, neural, and collective processes. This tutorial is designed to help psychological researchers bridge the gap between theoretical concepts in dynamic systems and their practical implementation using statistical modeling. Specifically, we demonstrate how to use the R packages lme4 [@bates2015fitting] and ctsem [@driver2018hierarchical] to translate dynamic systems principles into empirically testable models.
 
-To ground the abstract concepts of a dynamic systems model, we will use a running example of the impact of couples therapy on their affect over time. Our tutorial is iteratively builds in model complexity, starting from a very simple model of change, which assumes that a person's affect increases at a steady rate as the result of an ongoing therapy session, and ending with a model that aknowledges the complex interactions between the plethora of factors that contemporaneous interact to generate a person's affective trajectory.
+To illustrate these concepts in a concrete way, we use a running example: the impact of couples therapy on affect dynamics over time. We progressively build from simple to more complex models, starting with basic assumptions about linear affect change and gradually incorporating more sophisticated interactions between individuals, external influences, and random fluctuations. Through this step-by-step approach, we introduce *n* different affect processes that reflect increasing levels of complexity:
 
-We will show how to generate data and fit models that reflect six different affective process. Each affective process will build on its predecessor to foster the gradual understanding of sophisticated dynamic systems models. The contents are: 
+1. **Steady (Linear) Change (Discrete Time)**: an affect process that changes at a steady rate from an initial state of affect during each observation.
+2. **Nonlinear Change (Discrete Time)**: an affect process whose growth rate depends on a person's level of affect at the observation before the change happens--creating a nonlinear growth process.
+3. **Nonlinear Change with Random Fluctuations (Continuous Time)**: an affect process that changes continuously over time, and whose rate of change depends on a person's level of affect at the moment of change--creating a nonlinear growth process. Here we add the effect of unpredictable endogenous and exogenous events that can impact affect from moment to moment. The conceptual shift necessary to understand modeling in continuous is explained prior to the introduction of this model.
+4. **Couple Dynamics with Self and Partner Effects (Continuous Time)**: an affect process for a couple whose rate of change is dependent on their own level of affect and their partner's level of affect at a given moment.
+5. **Couple Dynamics with Individual Differences and Time-Independent Moderation (Continuous Time)**: an affect process for a couple whose rate of change is dependent on their own level of affect and their partner's level of affect at a given moment. In this model, the partner effects are moderated by the time they spend together (time-independent covariate).
+6. **Couple Dynamics with Individual Differences and Time-Dependent Moderation (Continuous Time)**: an affect process for a couple whose rate of change is dependent on their own level of affect and their partner's level of affect at a given moment. In this model, the partner effects are moderated by a time-varying moderator tracking whether the couple is together (time-dependent covariate). 
+7. **Nonlinear Change with a Transient External Shock (Continuous Time)**: an affect process whose growth rate depends on a person's level of affect at the observation before the change happens--creating a nonlinear growth process. Here the affect process is impacted by a therapy session that only directly impacts affect during the session.
+8. **Nonlinear Change with a Persistent External Shock (Continuous Time)**: an affect process whose growth rate depends on a person's level of affect at the observation before the change happens--creating a nonlinear growth process. Here the affect process is instantly impacted by a therapy session with a persistent effect.
 
-1. **A linear model of change in discrete time**: representing an affective process that changes at a steady rate from an initial state of affect during each observation.  
-2. **A linear model with state dependency in discrete time**: representing an affective process whose rate of change is impacted by the state of affect at the preceding observation.  
-3. **A linear model with state dependency in continuous time**: representing an affective process that changes continuously over time, and whose rate of change depends on the state of affect at the moment of change.  
-4. **A linear model of couple dynamics in continuous time, with auto state-dependency and cross state-dependency**: representing an affective process for a couple whose rate of change is dependent on their own level of affect and their partner's level of affect at a given moment.  
-5. **A linear model of couple dynamics in continuous time, with auto state-dependency and moderated cross state-dependency**: representing an affective process for a couple whose rate of change is dependent on their own level of affect and their partner's level of affect at a given moment. In this model, the effect each partner has on the other's rate of change in affect is moderated by the time they spend together.  
-6. **A linear model of couple dynamics in continuous time, with auto state-dependency and moderated cross state-dependency, and a time-specific external input**: representing an affective process for a couple whose rate of change is dependent on their own level of affect and their partner's level of affect at a given moment. Here, the effect each partner has on the other's rate of change in affect is moderated by the time they spend together, and the process is instantly impacted by a therapy session at a specific moment in time.
+Throughout the tutorial, we account for individual differences in model parameters, recognizing that people vary in how they respond to internal and external influences. By the end of this tutorial, researchers will have a structured approach to modeling affect dynamics in a way that captures both within-person change and between-person heterogeneity.
 
-Individual differences in model parameters are considered throughout the tutorial to better stable and slowly changing factors which generate heterogeneity in affective dynamics across people.
+# Steady (Linear) Change in Affect
+Let us start by considering a patient named Jill. Jill started going to couples therapy and has agreed to track her affect once every seven days (i.e. at equidistant time intervals), for 21 weeks, through a mobile app. What we want, is to use this data to understand how Jill's affect develops during this time. We develop some ideas about how Jill's development might look and pick the simplest one to start. Our first idea, is that Jill's affect will increase at a steady rate throughout the course of couples therapy. 
 
-# Getting started--Linear increase in mood
-In the simplest case, a person's mood would change at a steady rate throughout the course of couple's therapy. If we take imperfect measurements of a person's mood every 7 days (i.e. at equidistant time intervals), then a linear regression model would provide a good representation of change in that person's mood.
-
-With this this simple linear model, we state that a person's observed mood ($y$) changes at a steady rate ($B$) as a function of time ($t$) from an initial mood state ($\eta_{t0}$), and any deviations from this process are captured by a random noise term ($\epsilon$) to account for the imperfection of our measurements:
+Now we want to turn our conceptual idea of linear change into a statistical model that we can fit to data. For a steady increase in affect, a linear regression model is an appropriate choice. With our linear regression model, we state that Jill's observed affect ($y$) changes at a steady rate ($B$) as a function of time ($t$) from an initial affect state ($\eta_{t0}$), and any deviations from this process are captured by a random noise term ($\epsilon$) to account for the imperfection of our measurements:
 $$ y(t) = \eta_{t0} + B t + \epsilon(t) $$
 
-To help build intuition about the linear regression model of change in affect, we can generate data from the model and visualize the model-implied trajectory of mood over time. 
+Before we fit this model to Jill's data we can obtain a better understanding of the growth process it implies (and whether it matches our conceptual idea), by generating data from the model and visualizing its model-implied trajectory of affect. 
 
-## Generating Data
+## Simulation: A linear change model (N = 1)
 
-Below we provide the code needed to generate data from a linear regression model representing a steady rate of change in affect and visualize the model-implied trajectory of affect. To begin, we specify the number of time points we wish to generate data for (`Time <- 0:20`). Then we set the initial state of affect at the beginning of growth process, i.e. the beginning of therapy (`initialAffect <- 5`). Then we specify the linear regression model that will formalize our simple affective process for a single person, whose affect starts at an initial level (`initialAffect`) of 5 and increases steadily by 0.51 during every weekly observation (`Time*.51`). We add some, normally distributed, random noise to our model with a mean of 0 and a standard deviation of 1 (`rnorm(n=length(Time), mean = 0, sd = 1)`). We create a data frame to store the number of time points (i.e. weeks) and the model-implied affect measurements at each time point. Finally, we plot the data using a lineplot to illustrate the model-implied affect process over the course of 21 weeks of therapy.
+So let's write some code to generate data from a linear regression model representing a steady rate of change in affect and visualize its model-implied trajectory. First, we specify the number of time points we wish to generate data for (`Time <- 0:20`). Second, we set the initial state of affect at the beginning of the growth process, i.e. the beginning of therapy (`initialAffect <- 5`). Third, we specify the linear regression model that will formalize our linear affect process for a single person, whose affect starts at an initial level (`initialAffect`) of 5 and increases steadily by 0.51 during every weekly observation (`Time*.51`). Fourth, we add random noise to our model by sampling values from a normal distribution with a mean of 0 and a standard deviation of 1 (`rnorm(n=length(Time), mean = 0, sd = 1)`). These noise values are added to each affect value that is generated by our model. Fifth, we create a data frame to store the number of time points (i.e. weeks) and the affect values we generated for each time point. Finally, we plot the data using a lineplot to illustrate the model-implied affect process over the course of 21 weeks of therapy.
 
 ```{r linear-increase}
 Time <- 0:20 # Generate time points corresponding to each measurement occasion (e.g., week 0 to 20)
@@ -115,14 +114,21 @@ ggplot(data, aes(x = Time, y = Affect)) +
   labs(title = "Linear Increase in Affect Over Time", x = "Time (weeks)", y = "Affect") # add a title and labels to the plot
 ```
 
-# Dealing with individual differences in mood changes
+Here we see our linear model provides a good representation of the idea that Jill's affect increases at a steady pace each time we observe her. Albeit with some random fluctuations, which we can attribute to measurement error.
 
-We may want to know if couples therapy leads to a different amount of change for different people, and if differences in people's rate of change are related to their initial level of affect. For instance, people with severely low affect may benefit more from couple's therapy than people who are already quite content. The equation for a linear model which allows people to vary in their initial affect level and trajectory, looks very similar to the familiar linear regression model presented above but includes an $i$ subscript to indicate that each person has their own initial level ($\eta_{t0i}$) and trajectory ($B_{i}t$) of affect:
+## Dealing with individual differences in affect changes
 
-$$ y_i(t) = \eta_{t0i} + B_i t + \epsilon(t) $$
-We now generate data from our new linear regression model, which incorporates individual differences. The code below is used to generate data for 20 subjects `NSubjects <- 20` whose affect is measured 21  times, once per week for 21 weeks `times <- seq(from=0, to=20, by=1)`. To generate a different initial state for each subject, we sample 20 initial states from a normal distribution of initial affect levels with a mean of 5 and a standard deviation of 2 `initialAffect <- rnorm(n = NSubjects, mean = 5, sd = 2)`. The values here are arbitrary and can be tweaked to adjust the amount of heterogeneity in initial affect (sd) and the sample average initial affect level (mean). To match our hypothetical scenario, where people with lower affect increase faster, we can generate data so that people's rate of change is negatively correlated with people's initial level of affect `timeCoefficients <- rnorm(n = NSubjects, mean = 0.5, sd = 0.1) + scale(initialAffect) * -0.2`. Here we also use the scale function to generate data for the rate of change with a standardized coefficient, which can be a more intuitive representation of the rate of change.
+By viewing Jill's model-implied growth process it strikes us that we have no idea whether her rate of change is slow or fast relative to other people who go to couples therapy. That is we want to know if couples therapy leads to a different amount of change for different people, and if differences in people's rate of change are related to their initial level of affect. For instance, people who have a much lower level of affect than Jill to begin with may benefit more from couples therapy. Thus, before fitting our model to data, we introduce individual differences into our model.
 
-## Generating Data
+The equation for a linear model which allows people to vary in their initial affect level and rate of change, looks very similar to the linear regression model presented above but includes an $i$ subscript to indicate that each person has their own initial level ($\eta_{t0i}$) and rate of change ($B_{i}t$) of affect:
+
+$$ y_i(t) = \eta_{t0i} + B_i t + \epsilon_i(t) $$
+This model is commonly termed a linear mixed-effects model (REFs), because it includes both fixed effects (parameters that are assumed to be the same across all subjects, often interpreted as population-level effects) and random effects (parameters that allow for individual variations, such as subject-specific intercepts $\eta_{t0i}$ or slopes $B_i t$).
+
+## Simulation: A linear change model with individual differences
+
+We now generate data from our linear mixed-effects model. The code below is used to generate data for 20 subjects `NSubjects <- 20` whose affect is measured 21 times, once per week for 21 weeks `times <- seq(from=0, to=20, by=1)`. To generate a different initial state for each subject, we sample 20 initial states from a normal distribution of initial affect levels with a mean of 5 and a standard deviation of 2 `initialAffect <- rnorm(n = NSubjects, mean = 5, sd = 2)`. The values here are arbitrary and can be tweaked to adjust the amount of heterogeneity in initial affect (`sd`) and the sample average initial affect level (`mean`). To match our hypothetical scenario, where people's rate of growth in affect is related to their initial level, we can generate data so that people's rate of change is negatively correlated with people's initial level of affect `timeCoefficients <- rnorm(n = NSubjects, mean = 0.5, sd = 0.1) + scale(initialAffect) * -0.2`. Here we also use the scale function to generate data for the rate of change with a standardized coefficient, which can offer a more intuitive representation of the rate of change.
+
 ```{r multiple-subjects}
 # Generate data for multiple subjects with individual differences
 NSubjects <- 20
@@ -134,7 +140,7 @@ scale(initialAffect) * -0.2 # sample rate of change values that are negatively c
 cor(initialAffect, timeCoefficients) # check correlation in individual differences
 ```
 
-We can now create an empty data frame that can later hold the data we generate for each subject and each observation. To fill the dataframe we create two nested loops. The first loop `for(subi in 1:NSubjects)` allows us to go through each subject `subi` one by one. For each subject selected by the first loop, we initialize the second loop that allows us to go through each observation `obsi`. Within this loop we can fill in each row in our data frame, which corresponds to an observation. For each observation, we generate information for each observation about a person's affect level, the current time point (week), and their subject identifier. To keep track of the current observation for each iteration of our loop, we initialize the row count at 0 `row <- 0` and then add 1 to this running row count `row <- row + 1`. To reflect the imperfect measurement of affect, we add some random noise to the affect data that we generate by sampling random values from a normal distribution with a mean of 0 and a standard deviation of 1 `data$Affect <- data$Affect + rnorm(n=nrow(data), mean = 0, sd = .1)`.
+We can now create an empty data frame that can later hold the data we generate for each subject and each observation. To fill the data frame, we create two nested loops. The first loop `for(subi in 1:NSubjects)` allows us to go through each subject `subi` one by one. For each subject selected by the first loop, we initialize the second loop `for(obsi in 1:Nobs)` that allows us to go through each observation `obsi`. Within this loop, we fill in each row in our data frame, which corresponds to an observation. For each observation, we generate information about a person's affect level, the current time point (week), and their subject identifier. To keep track of the current observation for each iteration of our loop, we initialize a row count at 0 `row <- 0` and then add 1 to this running row count `row <- row + 1`. To reflect the imperfect measurement of affect, we add some random noise to the affect data that we generate by sampling random values from a normal distribution with a mean of 0 and a standard deviation of 1 `data$Affect <- data$Affect + rnorm(n=nrow(data), mean = 0, sd = .1)`.
 
 ```{r multiple-subjects2}
 #create empty data.frame to fill step by step
@@ -166,8 +172,9 @@ ggplot(data, aes(x = Time, y = Affect, color = as.factor(Subject))) +
 
 From our plot, we can see that the correlated initial state and rate of change capture the idea that individuals who start with lower affect levels may improve faster over time.
 
-## Fitting a linear model to multiple subjects with lme4
-Let us fit this model to the data using the lme4 software. We'll specify a linear growth model with random intercepts and slopes (i.e. linear mixed-effects model), which allows us to estimate a unique initial affect level (intercept) and rate of growth (slope) for each subject:
+## Fitting a model: A linear change model with individual differences in lme4
+
+We can now fit our model to the data we generated to exemplify how we could fit our statistical representation of our conceptual affect process to real data, and interpret how well it captures the pattern of our observations. To specify and fit our linear mixed-effects models, we will use the lme4 package in R:
 
 ```{r fitlme4,message=FALSE,results=FALSE}
 # Fit linear mixed-effects model
@@ -179,18 +186,18 @@ lme_model <- lmer(Affect ~ # predict Affect
   data = data) # specify data to fit model to
 ```
 
-After fitting the model we can ask for a summary of its parameter estimates.
+After fitting the model to our data, we can ask for a summary of its parameter estimates.
 
 ```{r compare-models}
 # Summary of model output
 summary(lme_model)
 ```
 
-We can see that our linear growth model, fitted with lme4, recovers the parameter values from the data generating model well. We can find the sample-average intercept and slope values under "Fixed effects". The variance of the subject-specific deviations from the sample average can be found under "Random effects". The correlation between the individual differences in the intercept and slope values is under the "Correlation of Fixed Effects" heading. For more information about lme4 and its functionalities we refer the reader to REF.
+For this simple affect process we can get a graps on the model-implied trajectory through the numerical estimates offered by lme4's output table. We can see that our linear mixed-effects model, recovers the parameter values from the data generating model well. We can find the sample-average intercept and slope values under "Fixed effects". The variance of the subject-specific deviations from the sample average can be found under "Random effects". The correlation between the individual differences in the intercept and slope values is under the "Correlation of Fixed Effects" heading. For more information about lme4 and its functionalities we refer the reader to REF.
 
-# Visualising predictions
+## Visualising predictions
 
-A useful tool to understand the predictions of our linear mixed-effects model, is to plot the model-implied trajectory and its associated uncertainty. Visualization is a great way to build intuition about the model implied affect trajectroy and allows us to detect sources of model misfit that may be difficult to identify by solely relying on numerical fit indices (see Gabry et al., 20XX for more examples). For our lme4 model, we can generate two plots: (1) the model's predictions (solid line and uncertainty shading) based only on the estimated model parameters for a single subject (subject 3); (2) predictions based on the model parameters and all data, (past, present, and future) of subject 3. 
+Once our models become more complicated a useful tool to understand their predictions is visualization. Visualization is a great way to build intuition about the affect process our model implies and allows us to detect sources of model misfit that may be difficult to identify by solely relying on numerical fit indices (see Gabry et al., 20XX for more examples). For our lme4 model, we can generate two plots showing: (1) the model's predictions (solid line) and its associated uncertainty (shaded ribbon) based only on the estimated model parameters for a single subject (subject 3); (2) predictions based on the model parameters and all data, (past, present, and future) of a single subject (subject 3).
 
 ```{r plot-predictions-lme4}
 # Define a function to extract predictions
@@ -218,7 +225,7 @@ ggplot(newdata[newdata$Subject==3,], aes(x = Time)) +
   theme_bw()+theme(legend.position = "bottom")
 ```
 
-The first plot, shows how well information solely from the estimated model parameters can reproduce our pattern of observations. The red dots show the observed affect values at each time point. The solid blue line shows the model implied trajectory of affect, with the shaded blue area surrounding the line showing the model's uncertainty about this trajectory. We can see that by solely relying on the model estimates, our model does a poor job of predicting the actual data points. The solid line does not map well onto the observed trajectory of affect and there is a large amount of uncertainty about the model-implied trajectory.
+The first plot, shows how well information solely from the estimated model parameters can reproduce our pattern of observations. The red dots show the observed affect values at each time point. The solid blue line shows the model implied trajectory of affect, with the shaded blue area surrounding the line showing the model's uncertainty about this trajectory. We can see that by solely relying on the model estimates, our model does a poor job of predicting the actual data points. The solid line does not map well onto the observed trajectory of affect, and there is a large amount of uncertainty about the model-implied trajectory.
 
 ```{r plot-predictions-lme4_2}
 # Define a function to extract predictions
@@ -243,18 +250,20 @@ ggplot(newdata[newdata$Subject==3,], #just visualise for subject 3
 
 In the second plot, we visualize the model's predictions after it has learned from all the observations in our dataset. So, data from past, present, and future observations are used by the model to predict each observation. Here the model-implied trajectory does an excellent job at mapping onto our observations and does so with high certainty.
 
-# Adding State Dependence
-So far we have assumed that a person's growth throughout the course of therapy is constant over time. This linear growth model leads to a suprising pattern due to the negative correlation between initial state and people's rate of growth. That is, people who start low tend to finish above subjects who started high.
+# Nonlinear Change (Discrete Time): Adding State Dependence
+
+By formalizing our linear growth process for Jill and other patients, we observe that our simple conceptual idea leads to a surprising prediction. Namely, therapy actually helps people with a lower initial level of affect to have a higher affect level at the end of the 21 weeks of therapy, compared to people who started with higher affect. This means that if Jill entered therapy with more severe affect problems she would come out of therapy with a higher level of affect than if she entered with less severe affect problems. Moreover, if we take our model with a steady rate of growth seriously, then this would imply that Jill could endlessly increase her affect levels by continuing therapy. Both of these predictions seem unrealistic. So we have to rethink our model of affect.
 
 A more defensible prediction could be to expect that people's rate of growth slows down as their affect improves. This would mean that people with a low initial level of affect would increase faster initially, relative to people with a higher initial level of affect, but their growth rate would slow down as their affect improves. In a statistical model, we can implement such a (nonlinear) growth process by allowing each person's slope to vary not just as a function of where they start, but also as a function of where they are *at every point in time*.
 
-Our statistical model of this nonlinear affect process can still be reprsented using a regression model. We can achieve our nonlinear growth model by computing the observed level of affect at each time point ($\eta(t)$) as a function of affect at the previous time point ($A\eta_{t-1}$), plus a constant value ($B$) that is added to each observation:
+Our statistical model of this nonlinear affect process can still be represented using a regression model. We can achieve our nonlinear growth model by computing the observed level of affect at each time point ($\eta(t)$) as a function of affect at the previous time point ($A\eta_{t-1}$), plus a constant value ($B$) that is added to each observation:
 
 $$\eta(t) = A\eta_{t-1} + B$$
-By plugging in some values into this equation we can quickly see that we can emulate a process where the rate of growth in affect dampens throughout the course of a therapy session. Our code does the heavy lifting of computation and allow us to visualize the model-implied trajectory that our equation creates. We set the autoregressive coefficient at 0.8, which means that 0.8 of the previous observation will be added to the current observation. Then we add a constant of 2, as our continuous intercept which is added to every observation. Starting from an initial level of affect of 5, we can see that 0.8*5 + 2 leads to an increase in affect of 1. By applying this equation to the next time point, we can see that our prior affect of 6 (5+1) leads to current affect of 6.8, and thus an increase of 0.8. So the rate of growth is dampening as consequence of a change in the prior level of affect. The provided code that does this computation for all of our 21 weeks, is simply solving the equation we just solved for each observation using as its input the affect level of the prior observation Affect[t-1] and our constant continuous intercept (B).
+By plugging in some values into this equation we can quickly see that we can emulate a process where the rate of growth in affect dampens throughout the course of a therapy session. Our code does the heavy lifting of computation and allows us to visualize the model-implied trajectory that our equation creates. We set the autoregressive coefficient at 0.8, which means that 0.8 of the previous observation will be added to the current observation. Then we add a constant of 2, as our continuous intercept which is added to every observation. Starting from an initial level of affect of 5, we can see that 0.8*5 + 2 leads to an increase in affect of 1. By applying this equation to the next time point, we can see that our prior affect of 6 (5+1) leads to current affect of 6.8, and thus an increase of 0.8. So the rate of growth is dampening as consequence of a change in the prior level of affect. 
 
+## Simulation: Nonlinear Change (Discrete Time)
 
-## Generating Data - Discrete-Time Style
+Below we provide code that does this computation for all of our 21 weeks, by simply solving the equation we just solved. First we need to set the degree to which the current level of affect is dependent on the prior level of affect (i.e. state dependence, `A <- .8`). Then we set an initial affect level to initialize our process (`initialAffect <- 5`) and a constant value which is added to each observation generating a consistent rate of growth (`B <- 2`), which when combined with the state dependence term generates a nonlinear growth trajectory. Within our loop an if-else statement is used so that the first observation is set the initial level of affect (`if(i==1) Affect[i] <- initialAffect`) and each subsequent observation has an affect value that is generated by our model equation (`else Affect[i] <- A*Affect[i-1] + B`).
 
 ```{r stateDependence}
 times <- seq(from=0, to=20, by=1) #generate sequence of time points when subjects are measured
@@ -277,33 +286,33 @@ ggplot(data.frame(Affect=Affect), aes(x = Time, y = Affect)) +
   labs(title = "State-Dependent Increase in Affect Over Time", x = "Time (weeks)", y = "Affect")
 ```
 
-Our figure shows a nonlinear increase in affect over time. This is a better representation of a reality where therapy cannot make you infinitely happy, but it may help to recover from a low point.
+Our figure shows a nonlinear increase in affect over time. This is a better representation of a reality where therapy cannot make you infinitely happy, but it may help you recover from a low point.
 
-## A conceptual shift to continuously evolving processes
+# A conceptual shift to continuously evolving processes
 
-Our model now provides a convincing depiction of a person's growth in affect from week to week. But what happens in between each of our weekly observations? One possibility is that affect stays flat and suddenly jumps during each of our weekly observations. That is, change only happens when we are looking. If we try to imagine such a discretely changing affect process, it would look like a staircase of affect. The alternative possibility is that people's affect changes continuously across time, forming a coherent trajectory. The rate of change that we observe from week to week is then an aggregate of all the moment-to-moment changes that happen between our weekly observations. If the second option is more akin to our expectation of reality, then we need to shift to a continuous time framework. For issues that arise when modeling continuous processes using discrete time models we refer the reader to Driver CL REF.
+Our model now provides a more realistic depiction of Jill's growth in affect from week to week. But what happens in between each of our weekly observations? One possibility is that affect stays flat and suddenly jumps during each of our weekly observations. That is, change only happens when we are looking. If we try to imagine such a discretely changing affect process, it would look like a staircase of affect. The alternative possibility is that people's affect changes continuously across time, forming a coherent trajectory. The rate of change that we observe from week to week is then an aggregate of all the moment-to-moment changes that happen between our weekly observations. If the second option is more akin to our expectation of reality, then we need to shift to a continuous time framework. For issues that arise when modeling continuous processes using discrete time models we refer the reader to Driver CL REF.
 
 ## Differential equations -- the mathematics of continuous time
-To formally represent continuously changing processes we need to embrace differential equations. But even without a technical understanding of differential equations researchers can form an intuitive understanding of continuous processes and apply them to their own substantive domain.
+To formally represent continuously changing processes we need to use differential equations. But even without a technical understanding of differential equations researchers can form an intuitive understanding of continuous processes and apply them to their own substantive domain.
 
 Our intuition can be aided by building a mental image of a continuously changing process. To do this we can imagine a discretely changing process where the size of the steps we take in time are extremely small. So small as to give the impression that change between two time points happens almost instantaneously.
 
-Now modeling a growth process in continuous time will be no different than in discrete time, in that we will use symbols that represent processes which we will visualize using simulations as a means of understanding the equation that generates our hypothesized affect process.
+Modeling a growth process in continuous time will be no different than in discrete time, in that we will use symbols to represent different factors and their relationships which add up to generate our growth process. To understand the equation that generates our hypothesized affect process we can again visualize the model-implied process using simulations. 
 
-For example, we can model an affect process that changes at a steady rate in continuous time, akin to our first example where we used a linear regression model. But this time using a differential equation. The major difference here is that our outcome variable (left-hand side of equation) is the rate of change in affect at any given moment in time. Instead of the level of affect, as in our discrete time (regression) representation. This rate of change in affect ($\eta$) at any given moment in time $t$ is denoted by the derivative $\frac{d\eta}{dt}$. We can think of the rate of change at a given moment in time as what we would get if we were to glance at a speedometer in our car. The velocity that we would see would tell us how fast our current position is changing at a particular moment in time. Since our model is linear, the rate of change is given by a constant value $B$. Thus, the differential equation for a linear model is:
+For example, we can model an affect process that changes at a steady rate in continuous time, akin to our first example where we used a linear regression model. But this time using a differential equation. The major difference here is that our outcome variable (left-hand side of equation) is the rate of change in affect at any given moment in time. Instead of the level of affect, which was used an outcome in our discrete time (regression) representation. This rate of change in affect ($\eta$) at a given moment in time $t$ is denoted by the derivative $\frac{d\eta}{dt}$. We can think of the rate of change at a given moment in time as what we would get if we were to glance at a speedometer in our car. The velocity that we would see, would tell us how fast our current position is changing at a particular moment in time. Since our model is linear, the rate of change at a given moment is given by a constant value $B$. Thus, the differential equation for a linear model is:
 
 $$\frac{d\eta}{dt} = B$$
 
-If we want to pick up where we left off and represent our nonlinear growth model in continuous time, we can simply add a term that allows the rate of growth at a given time point to depend on the current state of affect (i.e. a state dependency). We can now add this state dependency to our differential equation:
+If we want to pick up where we left off and represent our nonlinear growth model in continuous time, we can simply add a term that allows the rate of growth at a given time point to depend on the current state of affect (i.e. a state dependency):
 
 $$\frac{d\eta}{dt} = A\eta(t) + B$$
 
 In this equation the rate at which affect ($\eta(t)$) is changing at a given moment $t$ is a function of the current level of affect ($A\eta(t)$) plus a constant ($B$), which represents a steady input to the growth process that is independent of the effect that the current level of affect has on its own change.
 
-# Generating data -- continuous time style
-To generate data for this continuous growth process in R, we can approximate the solution to the differential equation using an 'Euler-Maruyama' method. This method works by breaking continuous time into small time slices (steps) and updating the state of our growth process at each step based on the model's dynamics.
+## Simulation: Nonlinear Change (Continuous Time) 
+To generate data for this continuous growth process in R, we can approximate the solution to the differential equation using a 'Euler-Maruyama' method. This method works by breaking continuous time into small time slices (steps) and updating the state of our growth process at each step based on the model's dynamics.
 
-To generate data, we first need to define values for our model parameters. This includes: (1) the degree to which the current level of affect influences its own rate of change (`A`, continuous time state-dependence). (2) A constant input to the growth process (`B`, continuous intercept), and an initial level of affect (`initialAffect`). Then we create an empty vector to store the affect values given by our for-loop which implements the 'Euler-Maruyama' method. The for-loop sets the initial level of affect for the first observation (i=1) to initialize the process. For each subsequent observation (i > 1) we compute the current level of affect by summing the rate of change at the prior time point (`dAffect = A*Affect[i-1] + B`) with level of affect at the prior time point (`Affect[i-1]`). To add the size of the desired time step into the equation, we multiply the rate of change by the size of the time step, in this case `dAffect` is multiplied by 1, meaning that the rate of change is equivalent to the rate of change between each observation.
+To generate data, we first need to define values for our model parameters. This includes: (1) the degree to which the current level of affect influences its own rate of change (`A`, continuous time state-dependence). (2) A constant input to the growth process (`B`, continuous intercept), and an initial level of affect (`initialAffect`). Then we create an empty vector to store the affect values given by our for-loop which implements the 'Euler-Maruyama' method. The for-loop sets the initial level of affect for the first observation (`i=1`) to initialize the process (`if(i==1) Affect[i] <- initialAffect`). For each subsequent observation (`i > 1`) we compute the current level of affect by summing the *rate of change* at the prior time point (`dAffect = A*Affect[i-1] + B`) with level of affect at the prior time point (`Affect[i-1]`). To add the size of the desired time step into the equation, we multiply the rate of change by the size of the time step, in this case `dAffect` is multiplied by 1, meaning that the rate of change is equivalent to the rate of change between each observation.
 
 ```{r continuous-time}
 times <- seq(from=0, to=20, by=1) # generate sequence of time points when subjects are measured
@@ -332,7 +341,7 @@ ggplot(data.frame(Affect=Affect),
   labs(title = "State-Dependent Increase in Affect Over Time", x = "Time (weeks)", y = "Affect")
 ```
 
-To make our solution more accurate we can take smaller steps in time, as shown below. But the computation will be more intensive. Here we want to take 10 steps in time between our observations to better approximate the continuous time process. Thus, we add the number of time steps we want to take, between each observation to our code (`Nsteps <- 10`). Now, we introduce another loop, within our previous for loop, which splits the interval between each observation (e.g. week) into 10 smaller steps (`istep`). The first line within this loop represents the differential equation which gives us the rate of change at the prior time point (`dAffect = A*AffectState + B`). The line below it, updates the current level of affect based on the estimated rate of change at the prior time point multiplied by 1/10 (i.e. `1/Nsteps`). The effect of this multiplication is to give the rate of change over the smaller step of time we chose. In essence, this scales the rate of change from the full unit of time (e.g. week), given by the preceding equation, to one-tenth to better approximate the underlying continuous growth process.
+To better approximate a continuous time solution, we can take smaller steps in time. But higher accuracy means that the necessary computation will be more intensive. So let's take 10 steps in the time between our observations to better approximate the continuous time process. Thus, we add the number of time steps we want to take, between each observation to our code (`Nsteps <- 10`). Now, we introduce another loop, within our previous for-loop, which splits the interval between each observation (e.g. week) into 10 smaller steps (`istep`). The first line within this loop represents the differential equation which gives us the rate of change at the prior time point (`dAffect = A*AffectState + B`). The line below it, updates the current level of affect based on the estimated rate of change at the prior time point multiplied by 1/10 (i.e. `1/Nsteps`). The effect of this multiplication is to give us the rate of change over the smaller step of time we chose. In essence, this scales the rate of change from the full unit of time (e.g. week), given by the preceding equation, to one-tenth to better approximate the underlying continuous growth process.
 
 ```{r continuous-time2}
 times <- seq(from=0, to=20, by=1) #generate sequence of time points when subjects are measured
@@ -366,15 +375,23 @@ ggplot(data.frame(Affect=Affect), # Plot the data
   labs(title = "State-Dependent Increase in Affect Over Time", x = "Time (weeks)", y = "Affect")
 ```
 
-# System Noise - Fluctuations in Affect
+# Nonlinear Change with Random Fluctuations (Continuous Time)
 
-Affect may change continuously, but it is unlikely to change smoothly. In the data we just generated, we assumed that affect changes in a smooth, deterministic, manner. However, real-world affective processes are often subject to unpredictable changes that lead a person's affect trajectory to fluctuate. We can model such fluctuations by adding a system noise term to our differential equation which generates random fluctuations in affect over time. We can generate such data for multiple subjects.
+Thinking about the time in between our weekly observations leads us to question how all the random events that happen in Jill's life impact her affect trajectory. That is, in the data we just generated, we assumed that affect changes in a smooth, deterministic, manner. However, real-world affect processes are often subject to unpredictable changes that lead a person's affect trajectory to fluctuate. We can model such fluctuations by adding a system noise term to our differential equation, which generates random fluctuations in affect over time. 
 
-## Generating Data -- System Noise and Individual Differences
+Let's work through how this is done. With our current equation, the rate of change in affect $\frac{d\eta}{dt}$ is purely deterministic, meaning that how fast affect changes at a given moment is entirely determined by the terms in the right-hand side of the differential equation ($A\eta(t) + B$). 
 
-$\textit{Adding system noise}$. To add system noise to our continuous time model, we will update the data generating code using the 'Euler-Maruyama' method (see Generating data -- continuous time style for an explanation of the method). The system noise term will be added to the affect level that is computed for each of our chosen time steps (`istep`). Thus, when we update a person's current affect state at each small time step we add some noise. This noise is sampled from a normal distribution with a mean of 0 and a standard deviation of 1 divided by `Nsteps` (this time 100 steps). Before being added to the function that generates the current affect state, each draw of random noise is multiplied by `G` (the system noise coefficient) to scale the amount of system noise. Thus, the higher the `G` value the more noisy the affect process.
+To model the influence of random influences on Jill's affect trajectory, we want to add a term that introduces a random "kick" to the rate of change at each moment. Meaning that aside from the deterministic effects there will be some random ups and downs in Jill's growth rate. For this we need to introduce a noise term which essentially adds a "kick" to the rate of change that is sampled from a normal distribution. This turns our (ordinary) differential equation into a stochastic differential equation, with stochastic denoting the random noise component of our continuous growth process. 
 
-$\textit{Individual differences}$. Since we are generating data for multiple individuals we make some further tweaks to our code. First, for each participant we sample their initial affect level from a normal distribution with mean 5 and standard deviation of 2 (`initialAffect <- rnorm(n = NSubjects, mean = 5, sd = 2)`). Second, we add an empty data frame which includes a greater number of rows to fill. Third, we add a loop to repeat the computation of the affective process for each subject `for(subi in 1:NSubjects)`.
+Because the random noise term wiggles too erratically to analytically define its rate of change at any point in time, stochastic differential equations are written a bit differently. That is, we model our continuous time process as evolving over infinitesimal (read extremely small) steps in time. At each infinitesimal step in time, our noise term adds a bit to the evolution of change. The amount that it adds is scaled by the system noise term, defining the volatility of the growth process. Thus, our rate of change in affect $d\eta(t)$ evolves via incremental changes, some deterministic ($A\eta(t) + B$), some random ($GdW(t)$), over each infinitesimal interval $dt$:
+
+$$d\eta = (A\eta(t) + B)dt + GdW(t)$$
+
+## Simulation: Nonlinear Change with Random Fluctuations (Continuous Time)
+
+*Adding system noise*. To add system noise to our continuous time model, we will update the data generating code using the 'Euler-Maruyama' method (see "Simulation: Nonlinear Change (Continuous Time)" for an explanation of the method). The system noise term will be added to the affect level that is computed for each of our chosen time steps (`istep`). Thus, when we update a person's current affect state at each small time step we add some noise. This noise is sampled from a normal distribution with a mean of 0 and a standard deviation of 1 divided by `Nsteps` (this time 100 steps). Before being added to the function that generates the current affect state, each draw of random noise is multiplied by `G` (the system noise coefficient) to scale the amount of system noise. Thus, the higher the `G` value the more noisy the affect process.
+
+*Individual differences*. To generate data for multiple individuals we have to make some further tweaks to our code. First, for each participant we sample their initial affect level from a normal distribution with mean 5 and standard deviation of 2 (`initialAffect <- rnorm(n = NSubjects, mean = 5, sd = 2)`). Second, we add an empty data frame which includes a greater number of rows to fill. Third, we add a loop to repeat the computation of the affect process for each subject `for(subi in 1:NSubjects)`.
 
 ```{r system-noise}
 # Generate data for multiple subjects with individual differences
@@ -423,9 +440,9 @@ ggplot(data, # Plot the data
   theme(legend.position = "none")
 ```
 
-Now we have a somewhat more realistic depiction of affective dynamics, with fluctuations around the smooth, state-dependent increase in affect over time. This model captures the idea that affective processes are subject to both predictable trends (e.g. due to a course of therapy) and random fluctuations, reflecting some of the complexity of real-world affective dynamics. Note also that here, individuals vary in their initial levels of affect, and the rate of change varies accordingly, such that therapy does not just help everyone at the same rate, and nor does it lead to unrealistic long term projections as we saw in the linear case -- there is a limit.
+Now we have a somewhat more realistic depiction of affect dynamics, with fluctuations around the smooth, state-dependent increase in affect over time. This model captures the idea that affect processes are subject to both predictable trends and random fluctuations, reflecting some of the complexity of real-world affect dynamics. Note also, that here individuals vary in their initial levels of affect, and the rate of change varies accordingly, such that therapy does not just help everyone at the same rate, and nor does it lead to unrealistic long term projections as we saw in the linear case -- there is a limit.
 
-# ctsem: A Flexible Tool for Dynamic Systems Modeling
+## ctsem: A Flexible Tool for Dynamic Systems Modeling
 
 To fit a continuous-time model with state-dependence and system noise we need to shift to a state-space framework. The R package `ctsem`[@driver2018hierarchical] provides a software framework for specifying and fitting continuous-time (CT) and discrete-time (DT) dynamic models. It enables researchers to model the behavior and evolution of processes over time, and its combination of features can offer some unique advantages for analyzing longitudinal data.
 
@@ -434,27 +451,42 @@ To fit a continuous-time model with state-dependence and system noise we need to
 Before starting, ensure your system is ready to use `ctsem`.
 Follow these steps:
 
-1. **Install R and RStudio**: Download and install R (https://cran.r-project.org/) and RStudio (https://posit.co/products/open-source/rstudio/).
-2. **Install Required Packages**:
+1. **Install R and RStudio**: Download and install R ([https://cran.r-project.org/](https://cran.r-project.org/)) and RStudio ([https://posit.co/products/open-source/rstudio/](https://posit.co/products/open-source/rstudio/)).
+2. **Configure Stan**: `ctsem` relies on Stan for model estimation.
+Ensure you have a compatible C++ compiler installed:
+   - **Windows**: Install RTools ([https://cran.r-project.org/bin/windows/Rtools/](https://cran.r-project.org/bin/windows/Rtools/)).
+   - **Mac**: Install Xcode command line tools by running `xcode-select --install` in the terminal.
+   - **Linux**: Install `g++` and other build tools using your package manager (e.g., `sudo apt install build-essential`).
+3. **Install Required Packages**:
    ```r
    install.packages(c("ctsem", "ggplot2", "lme4", "tinytex"))
    ```
-3. **Configure Stan**: `ctsem` relies on Stan for model estimation.
-Ensure you have a compatible C++ compiler installed:
-   - **Windows**: Install RTools (https://cran.r-project.org/bin/windows/Rtools/).
-   - **Mac**: Install Xcode command line tools by running `xcode-select --install` in the terminal.
-   - **Linux**: Install `g++` and other build tools using your package manager (e.g., `sudo apt install build-essential`).
 
-## Fitting a continuous-time model with state dependence and system noise 
+## Fitting a model: Nonlinear Change with Random Fluctuations (Continuous Time)
 
-To fit the data we just generated with `ctsem`, we first need to specify our model using the ctModel function. The code below is annotated for convenience, for more information about the specification of a continuous-time model using the ctModel function please refer to manual REF, p.29. Here we will provide a quick description of some of the links between the model equation and the software specification. 
+To fit the data we just generated with `ctsem`, we first need to specify our model using the `ctModel` function. The code below is annotated for convenience, for more information about the specification of a continuous-time model using the `ctModel` function please refer to manual REF, p.29. Here we will provide a quick description of some of the links between the model equation and the software specification. 
 
-1. The `LAMBDA` matrix is used to link the latent process to the observed variables. In this case, it is a 1×1 matrix with the value 1, meaning that the latent "Affect" is directly and equally reflected in the observed "Affect" without any scaling.
-2. The `MANIFESTMEANS` option reflects the measurement intercept which is simply a constant that is added to the measurement model to shift the relationship between observations and a latent variable. In this case it is set to zero, implying that there is no systematic offset in the measurement process.
-3. The `CINT` option specifies a continuous intercept. We call the continuous intercept `B` and only estimate a fixed effect (one value for all subjects). Switching off random effects works by adding `FALSE` behind `B||`, i.e. `B||FALSE`.
-4. The `T0MEANS` option specifies an initial level of affect. By adding `TRUE` behind `initialAffect||` we are allowing for random effects (between-subject variance) around the population estimate of the initial level of affect in our sample.
-5. The `DRIFT` option specifies the state dependence term, called `stateDependence`, making the rate of growth depend on the current level of affect.
-6. The `DIFFUSION` option specifies the system noise term, called `systemNoise`, allowing the model to capture fluctuations around the model-implied growth trajectory.
+Our `ctsem` model can be thought of as linking latent (unobserved) variables that we hypothesize drive the dynamics of affect to observed variables, which we observe directly. Observed variables are treated as indicators of the underlying latent process, and are linked to the latent states via a measurement model.
+
+In this case our latent dynamic model is given by the stochastic differential equation:
+
+$$d\eta = (A\eta(t) + B)dt + GdW(t)$$
+Here is how we specify this latent dynamic model using the `ctsem` syntax:
+
+1. The `DRIFT` option specifies the state dependence term $A\eta(t)$, which we call `stateDependence`, making the rate of growth depend on the current level of affect.
+2. The `CINT` option specifies the continuous intercept ($B$). We call the continuous intercept `B` and only estimate a fixed effect (one value for all subjects). To switch off random effects we need to add `FALSE` behind `B||`, i.e. `B||FALSE`.
+3. The `DIFFUSION` option specifies the system noise term ($GWd(t)$), which we call `systemNoise`, allowing the model to capture random fluctuations around the model-implied growth trajectory.
+4. The initial value of our latent process, is treated as a random variable with its own mean and variance parameters: $\eta_{t0} = \mu_{0i} + \epsilon_{0i}$, where $\epsilon_{0i} \sim \mathcal{N}(0,\sigma^2)$. The `T0MEANS` option, is used to specify the mean parameter for the initial level of affect, which we call `initialAffect`. By adding `TRUE` behind `initialAffect||` we are allowing for random effects (between-subject variance) around the population estimate of the initial level of affect in our sample. The `T0VAR` option specifies the variance parameter ($\sigma^2$) to estimate the initial level of affect at T0. By default `T0MEANS` and `T0VAR` are estimated from the data as free parameters.
+
+
+The latent process model is linked to our observations using a (linear) measurement model:
+
+$$Affect(t) = \Lambda*\eta(t) + \tau + \epsilon_1(t)$$
+Where $Affect(t)$ is the observed level of affect. $\Lambda$ is a matrix of regression weights used to link the latent process to our observations, $\eta$ is the latent level of affect, $\tau$ reflects a constant that can be used to shift the relationship between observations and a latent variable, and $\epsilon$ represents measurement error. 
+
+1. The `LAMBA` option specifies the $\Lambda$ matrix. In our case it is a 1x1 matrix with the value 1, meaning that the latent "Affect" ($\eta$) is directly and equally reflected in the observed "Affect" without any scaling.
+2. The `MANIFESTMEANS` option specifies the measurement intercept ($\tau$) which is simply a constant that is added to the measurement model to shift the relationship between observations and a latent variable. In this case it is set to zero, implying that there is no systematic offset in the measurement process.
+3. The `MANIFESTVAR` option specifies the measurement error term ($\epsilon_{1}$), which we call `residualSD`.
 
 ```{r ctsemfit2,message=FALSE,results=FALSE}
 # Fit continuous time structural equation model
@@ -477,12 +509,12 @@ ct_model <- ctModel( #define the ctsem model
 
 ```
 
-For readers that prefer to view the model equation, we can generate a LaTeX formatted represention of the equations we just specified by running the `ctModelLatex()` function. To do this we need to install the following package the `tinytex`, if we have not already done so. Sometimes there are difficulties getting latex compilation to work on various systems. For those who have difficulties, generally installing the R package tinytex via `install.packages('tinytex')`, then running `tinytex::install_tinytex()`, will be sufficient. In case of errors along the way, restarting R / Rstudio and clearing the workspace can help.
+For readers that prefer to view the model equation, we can generate a LaTeX formatted represention of the equations we just specified by running the `ctModelLatex()` function. To do this we need to install the following package the `tinytex`, if we have not already done so. Sometimes there are difficulties getting latex compilation to work on various systems. For those who have difficulties, generally installing the R package tinytex via `install.packages('tinytex')`, then running `tinytex::install_tinytex()`, will be sufficient. In case of errors along the way, restarting R / Rstudio and clearing the workspace can help. For those that do not want the trouble of potential troubleshooting, the output can be found below.
 
 ```{r TEX2,echo=FALSE,out.width='100%',cache=F}
-if (!tinytex::is_tinytex()) {
-    tinytex::install_tinytex()
-}
+#if (!tinytex::is_tinytex()) {
+#    tinytex::install_tinytex()
+#}
 
 ctModelLatex(ct_model,textsize = 'small', folder=texdir,
   filename = 'tex2',open=FALSE)
@@ -500,9 +532,9 @@ ct_fit <- ctStanFit(datalong = data, ctstanmodel = ct_model) #fit the model to o
 summary(ct_fit, parmatrices=FALSE) #print summary of the fit, some output disabled
 ```
 
-From our summary table, we can see that the estimated coefficients are not exactly the same as the true values due to the random fluctuations in the data. But the model captures the general trend of affective dynamics over time. The estimated state dependence coefficient is around -0.1, the continuous intercept is approximately 1, and the system noise coefficient is around .2. The random effects standard deviations for initial affect is approximately 2, and the residual standard deviation is around 0.05.
+From our summary table, we can see that the estimated coefficients are not exactly the same as the true values due to the random fluctuations in the data. But the model captures the general trend of affect dynamics over time. The estimated state dependence coefficient is around -0.1, the continuous intercept is approximately 1, and the system noise coefficient is around .2. The random effects standard deviations for initial affect is approximately 2, and the residual standard deviation is around 0.05.
 
-# Visualizing predictions
+## Visualizing predictions
 
 Using `ctsem` we can easily plot the model predictions and associated uncertainty. Our predictions can be conditional on all, none, or some of the individual subjects' observed data. 
 First let's look at the predictions based solely on the parameter estimates. 
@@ -525,15 +557,26 @@ ctKalman(fit= ct_fit, plot = TRUE, subjects = 3, removeObs = FALSE)
 
 Now the model does a fairly good job at predicting the observations, but there is still some uncertainty in its predictions.
 
-# Adding the Partner's Affect - Multivariate Systems
+# Couple Dynamics with Self and Partner Effects (Continuous Time)
 
-Until now, we have looked at one person's affect in isolation. But often, the way a person's affect changes is tied to how another person's affect changes, like in a romantic relationship. We will introduce such interdependence between a couple's affective dynamics in two ways. (1) A cross-effect state dependence term: reflecting the possibility that how one person is feeling at given moment can have a direct effect on how their partner's affect changes at that moment. This source of interdependence can be modeled using a cross-effect state dependence term. This is essentially the state dependence we modeled within a person, but now the state (affect level) that drives the rate of change is coming from another person. (2) A Common system noise term: Couples also experience a set of common events throughout their lives that can impact their affect in a similar way. We can model commonalities that generate random fluctuations in each partner's affective process, by adding positively correlated noise to each of their affective processes. 
+Until now, we have looked at Jill's affect in isolation. But she is going to couples therapy, which makes it very likely that how her partner, Bert, feels has a pronounced impact of how Jill feels. In the same way, Jill's affect is also likely to have a reciprocal impact on Bert's affect. This creates an interdependence between Jill and Bert's affect dynamics which we can model in two ways:
 
-## Generating Data
+1. We can introduce *a cross-effect state dependence term*, which captures the extent to which how Jill is feeling at given moment can have a direct effect on how Bert's affect changes at that moment. This is essentially the state dependence we modeled within a person, but now the state (affect level) that drives the rate of change is coming from another person. We can also introduce another cross-effect state-dependence term, capturing the influence of Bert's current state of affect on the Jill's rate of change at that moment.
 
-We will generate data for 20 couples. Each of the 40 people will have their own initial level of affect, but all dynamics and growth terms will be fixed across individuals for now.
+2. *A Common system noise term*, random life events that cause fluctuations in Jill's affect trajectory are also likely to contemporaneously impact Bert's affect (and vice versa). We can model factors that simultaneously shift our couple's rate of change, by adding a correlated noise term.
 
-*Couple dynamics*. To generate data for each couple, we can build on the previous model of affect that we used to represent the affect of one person. The first thing we need to add, is an equation to represent the growth process of the partner. Then we need to add two novel elements to the (differential) equations of both partners. In the code chunk below, we can see that we now have two equations to approximate two continuous affect processes, which are differentiated using `Affect1` (for partner 1) and `Affect2` (for partner 2). Apart from duplicating the equation for one person, each equation has *two* new elements to capture interdependency in affect dynamics. (1) The change in affect for each person depends on their partner's level of affect at the same time point. The coefficient of this cross-effect is denoted by `Across` (e.g. `dAffect1 <- A*Affect1State + Across * Affect2State + B`). (2) We allow the random fluctuations in the couple's affect process to covary. We do this by adding an additional source of random noise `systemNoiseCrossState` to each person's model equation which is scaled by a common system noise coefficient (`Gcross`).
+The revised model which includes Jill and Bert's affect dynamics along with their interdependence is:
+
+$$d\eta_{1} = (A_1\eta_1(t) + A_{cross_{12}}\eta_2(t) + B_1)dt + G_{11}dW_1(t) + G_{12}dW_2(t) $$
+$$d\eta_{2} = (A_2\eta_1(t) + A_{cross_{21}}\eta_1(t) + B_2)dt + G_{21}dW_1(t) + G_{22}dW_2(t)$$
+
+Now we have two equations, one to describe each partner's rate of change in affect. Here Jill's is denoted by 1 and Bert by 2. There are two differences within each equation. First, there is an additional term that specifies the effect that Bert's current level of affect has on Jill's rate of change at the same moment ($A_{cross_{12}}\eta_2(t)$). The same goes for Bert's equation ($A_{cross_{21}}\eta_1(t)$). Second, each equation has an additional system noise coefficient, capturing the effect of random fluctuations in Bert's affect on Jill's affect ($G_{12}dW_2(t)$), and the opposite in Bert's case ($G_{21}dW_1(t)$). 
+
+## Simulation: Couple Dynamics with Self and Partner Effects (Continuous Time)
+
+We will generate data for Jill and Bert along with another 19 couples (i.e. 20 couples). Each of the 40 people will have their own initial level of affect, but all dynamics and growth terms will be fixed across individuals for now.
+
+*Couple dynamics*. To generate data for each couple, we can build on the previous model of affect that we used to represent the affect of one person. The first thing we need to add, is an equation to represent the growth process of the partner. Then we need to add our cross-effect and common-noise terms to the (differential) equations of both partners. In the code chunk below, we can see that we now have two equations to approximate two continuous affect processes, which are differentiated using `Affect1` (for partner 1) and `Affect2` (for partner 2). Apart from duplicating the equation for one person, each equation has *two* new elements to capture interdependency in affect dynamics. (1) The change in affect for each person depends on their partner's level of affect at the same time point. The coefficient of this cross-effect is denoted by `Across` (e.g. `dAffect1 <- A*Affect1State + Across * Affect2State + B`). (2) We allow the random fluctuations in the couple's affect process to covary. We do this by adding an additional source of random noise `systemNoiseCrossState` to each person's model equation which is scaled by a common system noise coefficient (`Gcross`).
 
 ```{r 2varData}
 # Generate data for multiple subjects with individual differences
@@ -601,17 +644,81 @@ ggplot(data[data$Subject==1,], # Plot the data for the first couple
 
 Here we can see the growth process for one couple. Each partner's affect starts from a very different initial affect state, but quite quickly converges to a very similar trajectory. This can be partly attributed to the influence our couple has on each other's rate of growth over time. We can also see a similar pattern of fluctuations in their affect, around their overall level of growth. This is can be due to a set of common experiences the couple goes through, that impact their affect similarly.
 
-If we want to fit a `ctsem` to the data we generated, we need to make some adjustments to our earlier code. We have an affect variable for each person `Affect1` and `Affect2` which we list under `manifestNames` and `latentNames`.  
+## Fitting a model: Couple Dynamics with Self and Partner Effects (Continuous Time)
 
-1. The `LAMBDA` matrix is used to link the latent process to the observed variables. In this case, it is a 2×2 matrix with the value 1 on the diagonals and 0 on the off diagonals, meaning that the latent state for each person's affect "Affect1" and "Affect2" is directly and equally reflected in their observed, without any scaling.
-2. The `MANIFESTMEANS` option reflects the measurement intercept which is simply a constant that is added to the measurement model to shift the relationship between observations and a latent variable. In this case, it is set to zero, implying that there is no systematic offset in the measurement process.
-3. The `CINT` option specifies a continuous intercept. We call the continuous intercept `B` and only estimate a fixed effect (one value for all subjects). Switching off random effects works by adding `FALSE` behind `B||`. We now estimate one continuous intercept for each partner in a dyad (`B1` and `B2`).
-4. The `T0MEANS` option specifies an initial level of affect. By setting adding `TRUE` behind `initialAffect||` we are allowing for random effects (between-subject variance) around the population estimate of the initial level of affect in our sample. We estimate two `InitialAffect` parameters, one for each partner in a dyad (`InitialAffect1 ` and `InitialAffect2`).
-5. The `DRIFT` option specifies the state-dependence terms. We now call the within-person state-dependence term `autoEffect` (previously called `stateDependence`) with one parameter per partner (`autoEffect1` and `autoEffect2`). The between-partner state-dependence term is called `crossEffect`, with `crossEffect12` denoting the effect of partner 1's level of affect on partner 2's rate of growth, and `crossEffect21` the effect of partner 2's level of affect on partner 1's rate of growth.
-6. The `DIFFUSION` option specifies the system noise terms. The system noise that is unique to partner 1 is called `systemNoise1`, with `systemNoise2` being unique to partner 2. The correlation in system noise, reflecting common random fluctuations within a dyad, is called `systemNoiseCross`.
+To understand the `ctsem` syntax for our model with variables (one for each partner) is helps to transform the write out the model equation in matrix form to more easily link it with the more compact syntax of `ctsem`. So our latent dynamic model for a couple:
+
+$$d\eta_{1} = (A_1\eta_1(t) + A_{cross_{12}}\eta_2(t) + B_1)dt + G_{11}dW_1(t) + G_{12}dW_2(t) $$
+$$d\eta_{2} = (A_2\eta_1(t) + A_{cross_{21}}\eta_1(t) + B_2)dt + G_{21}dW_1(t) + G_{22}dW_2(t)$$
+becomes:
+
+$$
+\begin{aligned}
+\begin{pmatrix}
+d\eta_{1}\\
+d\eta_{2}
+\end{pmatrix} 
+
+=
+
+\left(\underbrace{\begin{pmatrix} A_1 & A_{cross_{12}}\\ A_{cross_{21}} & A_2  
+\end{pmatrix}}_{\text{Drift}}
+
+\underbrace{\begin{pmatrix} \eta_1 \\ \eta_2 
+\end{pmatrix}}_{{\eta(t)}} (t) + 
+
+\underbrace{\begin{pmatrix} B_1 \\ B_2 
+\end{pmatrix}}_{\text{CINT}}\right) dt +
+
+\underbrace{\begin{pmatrix} G_{11} & G_{12} \\ G_{21} & G_{22}
+\end{pmatrix}}_{\text{Diffusion}} 
+
+\underbrace{d \begin{pmatrix} W_1 \\ W_2
+\end{pmatrix} (t) }_{\text{dW(t)}}
+\end{aligned}
+$$
+
+Now we can connect the matrix form of our latent dynamic model to the `ctsem` syntax:
+
+1. The `DRIFT` option, specifies the auto- ($A$) and cross-effect ($A_{cross}$) state-dependence terms. We call them `autoEffect` and `crossEffect`, respectively.
+2. The `CINT` option specifies the continuous intercepts ($B1$ and $B2$). We call them continuous intercept `B1` and `B2`, and only estimate a fixed effect (one value for all subjects). To switch off random effects we need to add `FALSE` behind `B||`, i.e. `B||FALSE`.
+3. The `DIFFUSION` option specifies the system noise terms ($G_{11}, G_{22}, G_{12}, G_{21}$). The unique system noise is called `systemNoise` and common system noise is called `systemNoiseCross`.
+4. The initial values of our latent processes, are treated as random variables with their own mean and variance parameters: $\eta_{t0} = \mu_{0i} + \epsilon_{0i}$, where $\epsilon_{0i} \sim \mathcal{N}(0,\sigma^2)$. The `T0MEANS` option, is used to specify the mean parameter for each partner's initial level of affect, which we call `initialAffect1` and `initialAffect2`. By adding `TRUE` behind `initialAffect||` we are allowing for random effects (between-subject variance) around the population estimate of the initial level of affect in our sample. The `T0VAR` option specifies the variance parameter ($\sigma^2$) to estimate the initial level of affect at T0. By default `T0MEANS` and `T0VAR` are estimated from the data as free parameters.
 
 
-## ctsem Model Specification
+The latent process model is linked to our observations using a (linear) measurement model:
+$$
+\begin{aligned}
+\begin{pmatrix}
+Affect_{1}\\
+Affect_{2}
+\end{pmatrix} (t) 
+
+=
+
+\underbrace{\begin{pmatrix} 1 & 0\\ 0 & 1 
+\end{pmatrix}}_{\Lambda}
+
+\underbrace{\begin{pmatrix} \eta_1 \\ \eta_2 
+\end{pmatrix}}_{{\eta(t)}} (t) + 
+
+\underbrace{\begin{pmatrix} 0 \\ 0 
+\end{pmatrix}}_{\tau} +
+
+\underbrace{\begin{pmatrix} \sigma_1 & 0 \\ 0 & \sigma_2
+\end{pmatrix}}_{\Theta}
+
+\underbrace{\begin{pmatrix} \epsilon_1 \\ \epsilon_2
+\end{pmatrix} (t)}_{\epsilon(t)}
+\end{aligned}
+$$
+
+Where $Affect(t)$ is the observed level of affect. $\Lambda$ is a matrix of regression weights used to link the latent process to our observations, $\eta(t)$ is the latent level of affect, $\tau$ reflects a constant that can be used to shift the relationship between observations and a latent variable, and $\epsilon$ represents measurement error. 
+
+1. The `LAMBA` option specifies the $\Lambda$ matrix. Now it is a 2x2 matrix with the value 1 on the diagonal, meaning that the latent "Affect" ($\eta$) is directly and equally reflected in the observed "Affect" without any scaling.
+2. The `MANIFESTMEANS` option specifies the measurement intercept ($\tau$) which is simply a constant that is added to the measurement model to shift the relationship between observations and a latent variable. In this case it is set to zero, implying that there is no systematic offset in the measurement process.
+3. The `MANIFESTVAR` option specifies the standard deviation ($\Theta$) of the measurement error terms ($\epsilon_{1}$), which we call `residualSD1` and `residualSD2`.
+
 ```{r ctsemfit3,message=FALSE,results=FALSE}
 # Fit continuous time structural equation model
 ct_model <- ctModel( #define the ctsem model
@@ -637,7 +744,7 @@ ct_model <- ctModel( #define the ctsem model
 ctModelLatex(ct_model) #generate LaTeX representation of the model
 ```
 
-Below we generate the model equations, for a clearer view of the model structure.
+Below we generate the model equations, for a clearer view of the entire model structure.
 
 ```{r TEX3,echo=FALSE,out.width='100%',cache=F}
 ctModelLatex(ct_model,textsize = 'small', folder=texdir,
@@ -660,7 +767,7 @@ summary(ct_fit, parmatrices=FALSE) #print summary of the fit, some output disabl
 
 ## Visualise Predictions
 
-Here we'll look at predictions based on the estimated model parameters and every 5th data point for our 3rd dyad (subject 3). When we visualize predictions from our model, now including multivariate dynamics, state dependence, and random fluctuation, we see a very different picture to the earlier linear models. Our model is able to capture a reality where there is a complex interplay between the nonlinear affective dynamics of two individuals. The uncertainty in the predictions reflects two sources: The first, is that there are inherently unpredictable fluctuations in affect due to factors we have not observed or modeled. So our model is inevitably imperfect. The second, is that each measurement of affect is likely an imperfect indicator of the underlying affective state, so we can't be sure of the true state of the system even at the moment where we measure it (via e.g., a survey on a smartphone).
+Just like before, we can look at how well the model predicts our observations based on the estimated model parameters plus every 5th data point for our 3rd dyad (subject 3). When we visualize predictions from our model, now including multivariate dynamics, state dependence, and random fluctuation, we see a very different picture to the earlier linear models. Our model is able to capture a reality where there is a complex interplay between the nonlinear affect dynamics of two individuals. The uncertainty in the predictions reflects two sources: The first, is that there are inherently unpredictable fluctuations in affect due to factors we have not observed or modeled. So our model is inevitably imperfect. The second, is that each measurement of affect is likely an imperfect indicator of the underlying affect state, so we can't be sure of the true state of the system even at the moment where we measure it (via e.g., a survey on a smartphone).
 
 ```{r plot-predictions-ctsem-multivariate}
 ctKalman(fit = ct_fit, plot=TRUE, subjects = 3, kalmanvec=c('y','yprior'), removeObs = 5)
@@ -668,38 +775,40 @@ ctKalman(fit = ct_fit, plot=TRUE, subjects = 3, kalmanvec=c('y','yprior'), remov
 
 ## Visualise Dynamics -- independent shocks
 
-To more easily understand the dynamics implied by the estimated model parameters, we can run an imaginary experiment and plot its results. First, we will take both partners and place them in a completely controlled setting, where no external factors can impact their affective systems. Second, we will intervene on partner 1's affect to increase it by 1 at time 0. Third, we will observe how the effect of our intervention evolves over time, given the auto and cross state-dependencies of each partner's affective system. To do this, we will measure each partner's affect at discrete time points and track how much of our intervention effect (increase of 1) remains in the affective system of each partner with each subsequent observation. We can break this down further by plotting the degree to which the intervention effect remains in each partner's system as a function of their own level of affect and their partner's level of affect at the preceding time point.
-
-Put formally, we will plot an impulse response function, where we show the discrete time lag-t auto-regression and lag-t cross-regression coefficients where $t$ reflects the amount of time intervals that have passed since our shock of 1. Below we plot the resulting coefficients that determine each respective partner's expected change. Each partner's auto- and cross-regression coefficients are plotted from the scenario where they are shocked (affect increased by 1), but their partner is not (affect increased by 0).
+We can also use visualizations to build intuition about the model-implied dynamics (i.e. auto-effect and cross-effect state dependencies). To do this, we can create a plot that tracks the results of an imaginary experiment. In this experiment, we take both Jill and Bert, and place them in a completely controlled setting, where no external factors can impact their affect. That is, their affect remains at baseline unless we do something about it. Second, we intervene on Jill's affect to increase it by 1 at time 0. Third, we plot by how much Jill and Bert's affect is expected to change from baseline if we were to leave them in this controlled setting for 10 weeks, as a function of their auto-effect and cross-effect state dependencies. For example, if we increase Jill's affect by 1, her affect is expected to change by approximately 0.40 from baseline after 5 weeks (red solid line, `Affect1.Affect1` in the plot at time interval = 5) because of her auto self-dependency and the bidirectional cross-effects between her and Bert. Instead, Bert's affect is expected to increase by 0.20 by week 5 (green solid line, `Affect2.Affect1` in the plot at time interval = 5). We can also visualize what happens if we increase Bert's affect by 1 *instead* by viewing the blue and purple solid lines. This plot is known as an impulse response function.
 
 ```{r visualDynamics}
 ctStanDiscretePars(ct_fit,plot=T) #plot dynamics
 
 ```
 
-In the above plot, the auto-regression coefficient for partner 1 is `Affect1.Affect1` and the cross-regression for partner 1 is `Affect2.Affect1`. We can see that as time goes by, our intervention effect dissipates. The fact that person 1's autoregression coefficient is less than 1, means that their current state has an inherent dampening effect on their rate of change over time. The cross-regression coefficient on the other hand causes the rate of change to increase, since it adds to the rate of change from partner 2's current state of affect. In the beginning, the amount of affect that spills over to partner 1 from partner 2 is close to 0. But this changes because partner 1 also contributes to partner 2's rate of growth via their own cross-regression coefficient. This leads partner 2's level of affect to increase over time, which means that they also add more to the growth of partner 1. However, due to partner 2's auto-regression coefficient their level of affect eventually plateaus and so does the amount of growth they provide to partner 1's growth trajectory.
-
 ## Visualise Dynamics -- Correlated shocks
 
-Our hypothetical experiment with independent shocks, may have low generalizability to real world dynamic systems. This is because often a shock that happens to one partner can also affect the other partner (see https://doi.org/10.31234/osf.io/y3e9d, for more on the combined interpretation of system noise and dynamics). 
+Our hypothetical experiment with independent shocks, may have low generalizability to real world dynamic systems. This is because often a shock that happens to one partner can also affect the other partner (see [https://doi.org/10.31234/osf.io/y3e9d](https://doi.org/10.31234/osf.io/y3e9d), for more on the combined interpretation of system noise and dynamics). 
 
-To solve this issue, we can create a plot where we consider the estimated correlation in the system noise, which tells us to what extent the couples' fluctuations are related. This essentially means that when one partner experiences a random fluctuation in affect, the other partner is also likely to experience a fluctuation in the same (or opposite) direction. Instead of plotting an impulse response function based solely on an independent 1-unit shock, we modify the impulse response function to reflect that a shock to one partner comes with a correlated fluctuation in the other partner’s affect. For example, if the system noise correlation is estimated at 0.25, then when one partner's affect increases by 1 unit, the other partner’s affect is expected to change by approximately 0.25 units as a result of that shared noise component. With `ctsem`, we can simulate and plot the impulse response function such that when one partner is shocked by 1 unit, the response in the other partner is scaled by the system noise correlation. This gives a more realistic picture of the dynamic interplay between the partners.
+To solve this issue, we can create a plot where we consider the estimated correlation in the system noise, which tells us to what extent the Jill and Bert's fluctuations are related. This essentially means that when Jill experiences a random fluctuation in affect, Bert is also likely to experience a fluctuation in the same (or opposite) direction. Instead of plotting an impulse response function based solely on an independent 1-unit shock, we modify the impulse response function to reflect that a shock to one partner comes with a correlated fluctuation in the other partner’s affect. For example, if the system noise correlation is estimated at 0.25, then when one Jill's affect increases by 1 unit, Bert's affect is expected to change by approximately 0.25 units as a result of that shared noise component. With `ctsem` we can simulate and plot the impulse response function, such that when one partner is shocked by 1 unit the response in the other partner is scaled by the system noise correlation. This gives a more realistic picture of the dynamic interplay between the partners.
 
 ```{r visualDynamics2}
 ctStanDiscretePars(ct_fit,plot=T, observational=TRUE) #plot dynamics
 ```
 
-From this plot we see that when one partner's affect increases by 1 at T0, the other's partner's affect is expected to contemporaneously fluctuate in the same direction as well (positive system noise correlation). The lagged cross-regression coefficient also show that there is a positive bidirectional relationship between the two partners. Such that when one partner's affect increases we can expect that to cause a subsequent increase in the other partner's affect. Here, we can be sure that this reflects a causal effect because we generated the data with such an effect. But in a real-world scenario, we would need to consider the possibility of confounding variables that could explain the observed relationship. The system noise correlation can account for confounders that change very quickly (compared to the speed of change of affect), but is unlikely to sufficiently account for confounders that change at a similar speed to affect. For instance, a sudden loud noise that startles both partners will lead to a very brief fluctuation in affect for both partnersä affect, which will be absorbed into the system noise. However, a prologned period of gloomy weather might cause a gradual systematic shift in the affect of both partners that can be misinterpreted as evidence that one partner's affect direclty impacts the other's affect. Such slowly changing confounders are not accounted for in this model, but individual differences in the continuous intercept could be added to account for some such effects. More sophisticated individual-differences models could also be used. We will consider these later. 
+From this plot we see that when Jill's affect increases by 1 at T0, the Bert's affect is expected to contemporaneously fluctuate in the same direction as well (positive system noise correlation). The positive cross-effect coefficients also show that there is a positive bidirectional relationship between the two partners. Such that when one partner's affect increases we can expect that to cause a subsequent increase in the other partner's affect. Here, we can be sure that this reflects a causal effect because we generated the data with such an effect. But in a real-world scenario, we would need to consider the possibility of confounding variables that could explain the observed relationship. The system noise correlation can account for confounders that change very quickly (compared to the speed of change of affect), but is unlikely to sufficiently account for confounders that change at a similar speed to affect. For instance, a sudden loud noise that startles both partners will lead to a very brief fluctuation in affect for both partnersä affect, which will be absorbed into the system noise. However, a prologned period of gloomy weather might cause a gradual systematic shift in the affect of both partners that can be misinterpreted as evidence that one partner's affect direclty impacts the other's affect. Such slowly changing confounders are not accounted for in this model, but individual differences in the continuous intercept could be added to account for some such effects. More sophisticated individual-differences models could also be used. We will consider these later. 
 
 # Individual Differences in System Dynamics
 
-In the above models, we have generally assumed that all individuals have the same system dynamics, with the exception of initial starting points and, in some cases, the continuous intercept (linear slope term). In reality, people will have highly heterogeneous system dynamics. This is because there are likely to be an immense number of factors, some changing very slowly or not at all, and some changing very quickly, that contribute to what we might consider as the individual's dynamic system. Some of these factors may change slowly or not at all, with respect to our observed time window. These can reasonably be treated as stable individual differences. For example, some individuals may have a more stable affective system, with less random fluctuations, while others may have a more volatile system, with more random fluctuations. This might be due to innate factors or stable features of their environment. Some couples may be more dependent on each other for their affective states, while others may be more independent. Some individuals may tend to fluctuate around high levels of affect, while others may have more difficult circumstances and a generally lower baseline.
+In the above models, we have generally assumed that all individuals have the same system dynamics. In reality, people will have highly heterogeneous system dynamics. This is because there are likely to be an immense number of factors that contribute to what we might consider as the individual's dynamic system. Factors that change slowly or not at all, with respect to our observed time window, can reasonably be treated as stable individual differences. Such individual differences may exist in the magnitude of random fluctuations, with some people having more stable affect systems while others have a more volatile affect. Alternatively, in the case of couples, some dyads may have more interdependent affect dynamics with stronger coupling, while other dyads are more independent.
 
-## Generating Data
+# Couple Dynamics with Individual Differences and Time-Independent Moderation (Continuous Time)
 
-We are going to consider two source of individual differences. First, we are going to assume that individuals have differences in their long-term, post therapy baseline affect. This will be done by allowing individual differences in the continuous intercept. Second, couples who have been together longer have a stronger influence on each other's affect. This will be incorporated by allowing for individual differences in the strength of our cross-effect state-dependence terms, and allowing the size of each couple's cross-effect to depend on the time they have spent together.
+For our case, we are going to consider two sources of individual differences. First, we are going to assume that individuals have differences in their long-term, post therapy baseline affect. This will be done by allowing individual differences in the continuous intercept. Second, we will assume that couples who have been together longer have a stronger influence on each others' affect. This will be incorporated by allowing for individual differences in the strength of our cross-effect state-dependence terms, and by allowing the size of each couple's cross-effect to depend on the average time they spend together.
 
-The code chunk to run this simulation, builds on the code we used earlier. To generate a continuous intercept for each person we sample the from a normal distribution, e.g., `B1 <- rnorm(n = NSubjects, mean = 2, sd = .3)`. We assume that people with a higher affect are more likely to get in a relationship, thus we add a common value sampled from a normal distribution to the value for each person in a dyad. That is, `Bcommon <- rnorm(n = NSubjects, mean = 1, sd = .2)` is added to the sampled values of B1 and B2 (`B1 <- Bcommon + rnorm(n = NSubjects, mean = 2, sd = .3)`). To add individual differences in the continuous intercept parameter that we generate we simply index the parameter to denote that it is specific to the denoted subject. So `B1` becomes `B1[subi]` where `subi` refers to the subject identifier. A similar process is used to generate data for our heterogeneous cross-effects. We sample a cross-effect for each couple from a normal distribution and then add the time the couple has spent together, scaled by a coefficient that determines the degree of influence time spent together has on each couple's cross effects `Across <- rnorm(n= NSubjects, mean = .1, sd=.05) + .05*TimeTogetherZ`. The cross-effect parameter is also indexed in our data generating loop to generate a subject-specific parameter, e.g. `Across[subi] * Affect2State`.
+## Simulation: Couple Dynamics with Individual Differences and Time-Independent Moderation (Continuous Time)
+
+The code chunk to run this simulation, builds on the code we used earlier. To generate a continuous intercept for each person we sample the from a normal distribution, e.g., `B1 <- rnorm(n = NSubjects, mean = 2, sd = .3)`. We assume that people with a higher affect are more likely to get in a relationship, thus we add a common value sampled from a normal distribution to the value for each person in a dyad. That is, `Bcommon <- rnorm(n = NSubjects, mean = 1, sd = .2)` is added to the sampled values of B1 and B2 (e.g., `B1 <- Bcommon + rnorm(n = NSubjects, mean = 2, sd = .3)`).
+
+To add individual differences in the continuous intercept parameter, we index the parameter to denote that it is specific to the denoted subject. So `B1` becomes `B1[subi]` where `subi` refers to the subject identifier. 
+
+A similar process is used to generate data for our heterogeneous cross-effects. We sample a cross-effect for each couple from a normal distribution and then add the time the couple has spent together, scaled by a coefficient that determines the degree of influence time spent together has on each couple's cross effects `Across <- rnorm(n= NSubjects, mean = .1, sd=.05) + .05*TimeTogetherZ`. The cross-effect parameter is also indexed in our data generating loop to generate a subject-specific parameter, e.g. `Across[subi] * Affect2State`.
 
 ```{r data-individual-differences}
 # Generate data for multiple subjects with individual differences
@@ -779,13 +888,15 @@ ggplot(data, # Plot the data for all couples
   theme(legend.position = "none")
 ```
 
-## Individual differences using ctsem
+## Fitting a model: Couple Dynamics with Individual Differences and Time-Independent Moderation (Continuous Time)
 
-These individual differences can be accommodated in `ctsem` using both 'fixed' and 'random' effect approaches. In the fixed effect approach, we rely on observed covariates (time-independent predictors in `ctsem`) to moderate the system parameters and explain the individual differences. In `ctsem` these are at present largely restricted to linear effects. For alternative forms, the usual approach of including higher order terms (e.g., age and age squared) is possible. Creative use of `ctsem`'s modeling flexibility could also be used to estimate other nonlinear effects (e.g.interactions terms, exponentiation).
+These individual differences can be accommodated in `ctsem` using both 'fixed' and 'random' effect approaches. In the fixed effect approach, we rely on observed covariates (time-independent predictors in `ctsem`) to moderate the system parameters and explain the individual differences. In `ctsem` these are at present largely restricted to linear effects. For alternative forms, the usual approach of including higher order terms (e.g., age and age squared) is possible. Creative use of `ctsem`'s modeling flexibility could also be used to estimate other nonlinear effects.
 
-In the random effect approach, we assume that the individual differences are at least partly due to unobserved factors, and estimate the variance and correlations in these factors, relying purely on the observed data (without covariates) to estimate where each individual's parameter(s) sit with respect to their distribution of subject-specific deviations from the average population estimate. With both fixed and random effects, we essentially try to improve the estimated model for each individual by allowing individuals to have unique system dynamics, but not 'completely unique' -- we still rely to some extent on how other individuals behave (for more on hierarchical modeling see Driver 2018). In `ctsem` we can either decide to automatically specify random effects (preferable in most cases), or manually add random effects (for details on the manual method please see https://psycnet.apa.org/doi/10.1111/cdev.13990). For our example, we will leave the specification of the random effects to the `ctsem` backend.
+In the random effect approach, we assume that the individual differences are at least partly due to unobserved factors, and estimate the variance and correlations in these factors, relying purely on the observed data (without covariates) to estimate where each individual's parameter(s) sit with respect to their distribution of subject-specific deviations from the average population estimate. 
 
-So, let's  go over the new syntax in our `ctsem`. In terms of data that we fit our model on, we add the time couples spent together (`TimeTogetherZ`) as a stable source of individual differences (time-independent predictor). This is done using the argument `TIpredNames = c('TimeTogetherZ')`. By default when covariates are included in `ctsem` they moderate all parameters of the system. Thus, we turn the default moderation off using `tipredDefault = FALSE`. Now if we want our time invariant predictor to moderate a specific parameter, we need to explicitly specify the moderation. The moderation of a cross-effect (e.g. `crossEffect21`) by `TimeTogetherZ` can be specified within the DRIFT matrix by inserting the name of the predictor to the fifth slot (slots are denoted by the pipe `|` operator, where each `|` defines 1 slot). Thus, we write `crossEffect21||TRUE||TimeTogetherZ`. This would estimate the `crossEffect21` parameter, allow it to vary as a linear function of `TimeTogetherZ`, and allow for random effects (done by adding `TRUE` to the third slot, `crossEffect21||TRUE`) to account for any individual differences that could not be explained by `TimeTogetherZ`. It is important to note that moderators in `ctsem` can dramatically influence the interpretation of parameters and lead to confusion if care is not taken -- usually centering, and possibly scaling, the moderator(s) is a good idea. Since we also want random effects for the continuous intercept of each partner we specify these using `CINT=c('B1||TRUE','B2||TRUE')`. All the other arguments are explained in prior sections of this tutorial, or can be found in `ctsem` manual (<https://cran.r-project.org/package=ctsem/vignettes/hierarchicalmanual.pdf>).
+By combining fixed and random effects, we try to improve the estimated model for each individual by allowing individuals to have unique system dynamics, but not 'completely unique' -- we still rely to some extent on how other individuals behave (for more on hierarchical modeling see Driver 2018). In `ctsem` we can either decide to automatically specify random effects (preferable in most cases), or manually add random effects (for details on the manual method please see <https://psycnet.apa.org/doi/10.1111/cdev.13990>). For our example, we will leave the specification of the random effects to the `ctsem` back-end.
+
+So, let's  go over the new syntax in our `ctsem`. In terms of data that we fit our model on, we add the time couples spent together (`TimeTogetherZ`) as a stable source of individual differences (time-independent predictor). This is done using the argument `TIpredNames = c('TimeTogetherZ')`. By default when covariates are included in `ctsem` they moderate all parameters of the system. Thus, we turn the default moderation off using `tipredDefault = FALSE`. Now if we want our time-independent predictor to moderate a specific parameter, we need to explicitly specify the moderation. The moderation of a cross-effect (e.g. `crossEffect21`) by `TimeTogetherZ` can be specified within the DRIFT matrix by inserting the name of the predictor to the fifth slot (slots are denoted by the pipe `|` operator, where each `|` defines 1 slot). Thus, we write `crossEffect21||TRUE||TimeTogetherZ`. This would estimate the `crossEffect21` parameter, allow it to vary as a linear function of `TimeTogetherZ`, and allow for random effects (done by adding `TRUE` to the third slot, `crossEffect21||TRUE`) to account for any individual differences that could not be explained by `TimeTogetherZ`. It is important to note that moderators in `ctsem` can dramatically influence the interpretation of parameters and lead to confusion if care is not taken -- usually centering, and possibly scaling, the moderator(s) is a good idea. Since we also want random effects for the continuous intercept of each partner we specify these using `CINT=c('B1||TRUE','B2||TRUE')`. All the other arguments are explained in prior sections of this tutorial, or can be found in `ctsem` manual (<https://cran.r-project.org/package=ctsem/vignettes/hierarchicalmanual.pdf>).
 
 ```{r modelIndividualDiffs,message=FALSE,results=FALSE}
 # Fit continuous time structural equation model
@@ -817,7 +928,7 @@ ct_fit <- ctStanFit(datalong = data, ctstanmodel = ct_model) #fit the model to o
 s = summary(ct_fit, parmatrices=FALSE) #store summary of the fit
 ```
 
-Now if we look at the `$tipreds` (time independent predictors) section of the summary, we have an estimated value for the effect of time together on the cross-effect state dependence. We can see that the cross-effect state dependence increases by approximately .05 for each increase of 1 in standardized time together. Thus, partner's who spent more time together have more tightly coupled affect.
+Now if we look at the `$tipreds` (time-independent predictors) section of the summary, we have an estimated value for the effect of time together on the cross-effect state dependence. We can see that the cross-effect state dependence increases by approximately .05 for each increase of 1 in standardized time together. Thus, partner's who spent more time together have more tightly coupled affect.
 
 ```{r tipreds}
 print(s$tipreds)
@@ -831,27 +942,171 @@ print(round(s$rawpopcorr,2))
 
 ## Visualise Individual Differences
 
-We can plot the trajectory of affect implied by the estimated model parameters, conditional on values of -1, 0, and 1 on any time independent predictors included in the model. 
+We can plot the trajectory of affect implied by the estimated model parameters, conditional on values of -1, 0, and 1 on any time-independent predictors included in the model. 
 
-The first set of plots (`Effect of TimeTogetherZ on observed trajectory`), show the observed trajectory of partner 1 (Affect1) and partner 2 (Affect2) based on the three cutoffs of `TimeSpentTogetherZ` (-1.28, 0.01, 1.06). We can see that partner's that spent more time together have a faster rate of growth in affect and also plateau at a higher affect value. The second set of plots (`Effect of TimeTogetherZ on latent trajectory`), shows the same information but for the latent trajectories of affect.
+The first set of plots (`Effect of TimeTogetherZ on observed trajectory`), show the observed trajectory of partner 1 (Affect1) and partner 2 (Affect2) based on the three cutoffs of `TimeSpentTogetherZ` (-1.28, 0.01, 1.06). We can see that couples that spent more time together have a faster rate of growth in affect and also plateau at a higher affect value. The second set of plots (`Effect of TimeTogetherZ on latent trajectory`), shows the same information but for the latent trajectories of affect.
 
-The third set of plots, (`Temporal regressions | independent shock of 1.0`) show an impulse response function for an independent 1-unit shock, but this time separated by the our cutoffs of time spent together. Here we can visualize the fact that the cross-regression coefficients are higher for couples that spend a greater amount of time together. The fourth set of plots (`Temporal regressions | correlated shock of 1.0`), shows the impulse response function but this time taking into consideration the estimated correlated system noise.
+The third set of plots, (`Temporal regressions | independent shock of 1.0`) show an impulse response function for an independent 1-unit shock, but this time separated by the our cutoffs of time spent together. Here we can visualize the fact that when a person experiences a shock to their affect (increase of 1) their partner is expected to change more over time if they spend more time together, on average. The fourth set of plots (`Temporal regressions | correlated shock of 1.0`), shows the impulse response function but this time taking into consideration the estimated correlated system noise.
 
 
 ```{r visualIndDiffs}
 ctPredictTIP(ct_fit, plot=T, tipreds = c('TimeTogetherZ'))
 ```
 
-# Intervention / Input Effects
 
-In the previous examples, we have considered the dynamics of affective processes in the absence of any external interventions. However, in many cases, we are interested in how an intervention, such as a therapy or a change in the environment, might influence affective dynamics. We can extend the model to include an input effect, which captures the influence of an external intervention on the system dynamics. 
+# Couple Dynamics with Individual Differences and Time-Dependent Moderation (Continuous Time)
 
-## Generating Data
+We may feel uncomfortable relying on people's retrospective estimate of how much time they spend together to moderate their degree of interdependence. However, we also do not want to assume that couples continuously affect each other even when they are not in each others presence. For instance, if Jill gets fired, her change in affect would immediately influence Bert's affect, according to our model, even if Bert is completely unaware of this event. If we have information about Jill and Bert's proximity, we can use this information to tell our model to only allow Jill's affect to impact Bert's rate of change when the couple is together. This can be done by moderating our couple's cross-effect parameter by a time-dependent moderator of presence.
 
-To add an intervention effect to our data generating model, we will make use of an `ifelse` statement within our data generating loop. We need to take two steps to make this work. First, we need to define the precise time point where we want our intervention input to occur. In our case we choose to intervene after half of our time window has passed `inputTime <- times[ceiling(length(times)/2)]`. Second, for each iteration of our loop we evaluate the time point at each observation to see if it matches the time of the intervention we have specified (i.e. `inputTime`). When the answer becomes yes, then we add our intervention effect to the model the generates the level of affect during that observation. This is done by adding `M` to the generated rate of change (`dAffect + M`) during the given observation, where M is the input effect coefficient determining the effect size of our intervention.
+## Simulation: Couple Dynamics with Individual Differences and Time-Dependent Moderation (Continuous Time)
+
+To generate data for a model with time-moderated cross-effect state dependence, we first need to generate a time-dependent moderator that indicates when a couple is communicating (0 no communication, 1 = communication). To do this, we will sample a value of 0 or 1 from a binomial distribution, where the probability of communication at each observation is given by the time couples spend together `Comm <- rbinom(n = NSubjects, size = 1, prob = TimeTogether / 20)`. Such that couples that spend more time together will have more observations when they are communicating, and thus impact each other's affect. To sample a value for each observation `Nobs` per subject `Nsubjects` we use the lapply function, which is essentially a loop over each `TimeTogetherValue` (`t`), `Comm <- lapply(TimeTogether, function(t) rbinom(n = Nobs, size = 1, prob = t / 20))`.
+
+Second, we add our generated time-dependent predictor as a time-dependent moderator in our subject-level equations of affect dynamics. So then the rate of change for partner 1 becomes `dAffect1 <- A*Affect1State + Across[subi] * Affect2State * comm_val + B1[subi]`, where `Across` is multiplied by `comm_val` at each time step. This make it so there is no cross-effect when the couple is not communicating (`comm_val` = 0). The `comm_val` used at each time-step is the observed `Comm` value during of the current observation, `comm_val <- Comm[[subi]][obsi]`. 
+
+```{r dataModeratedCoupling}
+# Generate data for multiple subjects with individual differences
+NSubjects <- 20
+times <- seq(from=0, to=40, by=1) #generate sequence of time points when subjects are measured
+Nobs <- length(times) #number of observations per subject
+initialAffect1 <- rnorm(n = NSubjects, mean = 5, sd = 2)
+initialAffect2 <- rnorm(n = NSubjects, mean = 5, sd = 2)
+TimeTogether <- runif(n=NSubjects, min = 0, max = 20) #time together in years
+TimeTogetherZ <- scale(TimeTogether) #standardise time together
+A <- -.4 #continuous time state dependence
+Across <- rnorm(n= NSubjects, mean = .1, sd=.05) #cross-effect state dependence
+
+# Sample from a binomial distribution with prob based on time spent together
+Comm <- lapply(TimeTogether, function(t) rbinom(n = Nobs, size = 1, prob = t / 20))
+
+# Check the relationship: compute the mean interaction for each subject and correlate with TimeTogetherZ
+Comm_means <- sapply(Comm, mean)
+print(cor(Comm_means, TimeTogetherZ))
+
+# generate continuous intercepts for each individual, 
+# assuming high affect individuals may partner with high affect individuals
+Bcommon <- rnorm(n = NSubjects, mean = 1, sd = .2) #common continuous intercept variance
+B1 <- Bcommon + rnorm(n = NSubjects, mean = 2, sd = .3) #unique continuous intercept for individual 1
+B2 <- Bcommon + rnorm(n = NSubjects, mean = 2, sd = .3) #continuous intercept for individual 2
+cor(B1,B2) #check if people with higher affect tend to couple
+
+G <- .4 #unique system noise coefficient
+Gcross <- .1 #common system noise coefficient
+
+#create empty data.frame to fill step by step
+data <- data.frame(Subject= rep(NA,NSubjects*Nobs), 
+  Time = rep(NA,NSubjects*Nobs), 
+  Affect1 = rep(NA,NSubjects*Nobs),
+  Affect2 = rep(NA,NSubjects*Nobs)) #now with affect for two individuals
+
+Nsteps <- 100 #number of steps in time to compute between each observation (increased computational accuracy)
+
+row <- 0 #initialize row counter, to track which row of the data.frame we are on
+for(subi in 1:NSubjects){
+  for(obsi in 1:Nobs){ #for each observation of a subject
+    row <- row + 1
+    comm_val <- Comm[[subi]][obsi]
+    if(obsi==1){
+      Affect1State <- initialAffect1[subi] #if first time point, set to initial affect
+      Affect2State <- initialAffect2[subi]
+    }
+    if(obsi>1){ #else compute new affect state by taking a sequence of small steps in time
+      for(stepi in 1:Nsteps){ #take Nsteps in time between each observation
+
+        #compute deterministic slope of affect at earlier time point
+        dAffect1 <- A*Affect1State + Across[subi] * Affect2State * comm_val + B1[subi] 
+        dAffect2 <- A*Affect2State + Across[subi] * Affect1State * comm_val + B2[subi]
+        
+        systemNoiseState1 <- rnorm(n=1, mean=0, sd=sqrt(1/Nsteps)) #unique noise for individual 1
+        systemNoiseState2 <- rnorm(n=1, mean=0, sd=sqrt(1/Nsteps)) #unique noise for individual 2
+        systemNoiseCrossState <- rnorm(n=1, mean=0, sd=sqrt(1/Nsteps)) #common noise for both individuals
+        
+        #update states using slope and time step, and add unique and common system noise
+        Affect1State <- Affect1State + dAffect1 * 1/Nsteps + 
+          G * systemNoiseState1 + Gcross * systemNoiseCrossState 
+        
+        Affect2State <- Affect2State + dAffect2 * 1/Nsteps + 
+          G * systemNoiseState2 + Gcross * systemNoiseCrossState
+        
+      }
+    }
+    data$Affect1[row] <- Affect1State #input affect data
+    data$Affect2[row] <- Affect2State #input affect data
+    data$Time[row] <- times[obsi] #input time data
+    data$Comm[row] <- comm_val
+    data$Subject[row] <- subi #input subject data
+    data$TimeTogetherZ[row] <- TimeTogetherZ[subi] #input time together data
+    data$const[row] <- 1 # add constant for ctsem spec
+  }
+}
+
+data$Affect1 <- data$Affect1 + rnorm(n=nrow(data), mean = 0, sd = .05) #add measurement error
+data$Affect2 <- data$Affect2 + rnorm(n=nrow(data), mean = 0, sd = .05) #add measurement error
+
+ggplot(data, # Plot the data for all couples
+  aes(x = Time, y = Affect1, color = as.factor(Subject))) +
+  geom_line() +
+  geom_line(aes(y = Affect2), linetype = "dashed") +
+  geom_point() +
+  theme_bw()+
+  labs(title = "Coupled Affect in Dyads")+ 
+  theme(legend.position = "none")
+```
+
+## Fitting a model: Couple Dynamics with Individual Differences and Time-Dependent Moderation (Continuous Time)
+
+To specify a model with a time-dependent moderator in `ctsem` we need to take four new steps. First, we need to specify the name of our time-dependent predictor using `TDpredNames = c("Comm")` where `Comm` is the name we give to our moderator. Second, we need to define the main effect of our predictor using the `TDPREDEFFECT` argument. By default this is set to free estimate a main effect for a time-dependent predictor. However, in our case we only want an interaction effect so we are going to set this to 0, `TDPREDEFFECT = 0`. Third, we need to modify our drift matrix. Here we are going to specify the interaction between our cross-effect state dependence terms and our time-dependent moderator, by specifying that our cross-effect state dependence is a function of an intercept (capturing a baseline cross-effect, i.e., when our moderator is 0) and an interaction term capturing the current level of our cross-effect which is moderated (multiplied) by the value of our moderator at a given time point, e.g., our cross-effect becomes `crossEffect12int + CrossEffect12level*Comm`. To specify our cross-effect as a function of multiple elements, we need to use the `PARS` argument. Here we can also specify random effects, in our baseline cross-effects, e.g., `crossEffect12int||TRUE`.  
+
+```{r modelDiscModeration,message=FALSE,results=FALSE,eval=TRUE}
+# Fit continuous time structural equation model
+ct_model <- ctModel( #define the ctsem model
+  #TIpredNames = c('TimeTogetherZ'), #names of time independent predictors in dataset
+  manifestNames = c("Affect1",'Affect2'), #names of observed variables in dataset
+  latentNames = c("Affect1",'Affect2'), #names of latent processes
+  TDpredNames = c('Comm'), #names of time dependent predictors in dataset
+  time = 'Time', #name of time column in dataset
+  id = 'Subject', #name of subject column in dataset
+  type='ct', #use continuous time / differential equation model (standt for discrete-time / regression model)
+  MANIFESTVAR = c(
+    'residualSD1',0,
+    0, 'residualSD2'), #sd of the residual / measurement error
+  LAMBDA = diag(1,2), #relating latent process to observed variables
+  MANIFESTMEANS=0, #no measurement intercept / offset needed (1 observed variable relates directly to latent)
+  CINT=c('B1||TRUE','B2||TRUE'), #continuous intercept with random effects
+  T0MEANS=c('initialAffect1||TRUE','initialAffect2||TRUE'), #initial affect with random effects
+  TDPREDEFFECT = 0,
+  DRIFT = c(
+    'autoEffect1', '(crossEffect12int + CrossEffect12level*Comm)', #state dependence for individual 1 and cross-effect from 2 to 
+    '(crossEffect21int + CrossEffect21level*Comm)','autoEffect2'), #cross-effect from 1 to 2 and state dependence for individual 2
+  DIFFUSION = c(
+    'systemNoise1', 0, #system noise person 1, 0 in upper triangle (correlation needs 1 par)
+    'systemNoiseCross', 'systemNoise2'), #correlation in system noise, system noise person 2
+  PARS = c('crossEffect12int||TRUE','crossEffect21int||TRUE',
+           'CrossEffect12level','CrossEffect21level')) 
+ctModelLatex(ct_model) #generate LaTeX representation of the model
+```
+
+```{r fitInputDiscMod}
+ct_fit <- ctStanFit(datalong = data, ctstanmodel = ct_model) #fit the model to our data
+summary(ct_fit, parmatrices=FALSE) #print summary of the fit, some output disabled
+```
+
+```{r visualDiscMod}
+ctKalman(fit = ct_fit, plot=TRUE, subjects = 3, kalmanvec=c('y','yprior'), removeObs = 5)
+ctStanDiscretePars(ct_fit,plot=T, observational=TRUE) #plot dynamics
+```
+
+# Nonlinear Change with a Transient External Shock (Continuous Time)
+
+The last element we will consider in this tutorial is how to explicitly model an external influece at a specific time point with a specific form. So let's return to our example of Jill to make things more concrete.
+
+Let's say Jill is going through therapy and improving at a rate given by her dynamic system parameters that we used so far. What happens if she encounters a traumatic event in the midst of her 21 weeks of therapy? Such an event could have a pronounced effect on Jill's affect dynamics that a realistic model of her growth needs to consider. We can incorporate this into our dynamic systems model using an input effect, which captures the influence of an external intervention on the system dynamics.
+
+## Simulation: Nonlinear Change with a Transient External Shock (Continuous Time)
+
+To add an intervention effect to our data generating model, we will make use of an `ifelse` statement within our data generating loop. We need to take two steps to make this work. First, we need to define the precise time point where we want our intervention input to occur. In our case, we choose to intervene after half of our time window has passed `inputTime <- times[ceiling(length(times)/2)]`. Second, for each iteration in our loop, we evaluate the time point at each observation to see if it matches the time of the intervention we have specified (i.e. `inputTime`). When the answer becomes yes, then we add our intervention effect to the model that generates the rate of change in affect during that observation. This is done by adding `M` to the generated rate of change (`dAffect + M`) during the given observation, where M is the input effect coefficient determining the effect size of our intervention.
 
 To save the input variable in our data frame, we add a column called input where the value is 1 when `inputTime` matches `Time` and 0 otherwise.
-
 
 ```{r dataInputSimple}
 # Generate data for multiple subjects with individual differences
@@ -904,9 +1159,9 @@ ggplot(data, # Plot the data
   theme(legend.position = "none")
 ```
 
-Now we have a depiction of affective dynamics with an input effect, which decreases affect by 2 units at the intervention time.   
+Now we have a depiction of affect dynamics with an input effect, which decreases affect by 2 units at the intervention time.   
 
-## Fitting the Data with a ctsem Model
+## Fitting a model: Nonlinear Change with a Transient External Shock (Continuous Time)
 
 To specify a ctsem model with an intervention effect, we simply need to specify a time-dependent predictor `TDpredNames = Input`. This adds a within-person covariate that has the same effect on each person in our dataset.
 
@@ -949,7 +1204,126 @@ summary(ct_fit, parmatrices=FALSE) #print summary of the fit, some output disabl
 
 # Different Types of Inputs
 
-The model above implies that the input effect is immediate and has a lasting effect on the system, as we can see in the plot where the level takes time to recover -- but there is also the assumption that the effects transmit through time with the same dynamics as the rest of the system. This is probably the simplest approach to thinking about such effects, but in reality, the effects of an intervention may be more complex, and may depend on the individual, the context, may induce other changes in the system, and may persist or transfer through the system in different ways to the typical system behaviour. For example, while the regular ups and downs of life may dissipate relatively quickly, a traumatic event may have effects that last over a long period and may require more consideration. 
+The model above implies that the input effect is immediate and has a lasting effect on the system, as we can see in the plot where the level takes time to recover -- but there is also the assumption that the effects transmit through time with the same dynamics as the rest of the system. This is probably the simplest approach to thinking about such effects, but in reality, the effects of an intervention may be more complex, and may depend on the individual, the context, may induce other changes in the system, and may persist or transfer through the system in different ways to the typical system behavior. For example, while the regular ups and downs of life may dissipate relatively quickly, a traumatic event may have direct effects that last over a long period and may require more consideration.
 
-No detail here yet -- for discussion on this topic see <https://link.springer.com/chapter/10.1007/978-3-319-77219-6_4> or open access <https://www.researchgate.net/profile/Charles-Driver/publication/328221807_Understanding_the_Time_Course_of_Interventions_with_Continuous_Time_Dynamic_Models/links/5f59dc35299bf1d43cf91ce1/Understanding-the-Time-Course-of-Interventions-with-Continuous-Time-Dynamic-Models.pdf> 
+# Nonlinear Change with a Persistent External Shock (Continuous Time)
+
+For our example, we can a model an intervention effect that has a persistent effect on all future instances of our system. For more examples of intervention effects and how to specify them in `ctsem` we refer the reader to <https://link.springer.com/chapter/10.1007/978-3-319-77219-6_4>.
+
+The simplest way to add a persistent external shock would be to just use a dummy variable that applies a 0 to all observations prior to the intervention and a 1 to all observations post (and including) the time of the intervention. However, this would lead to a spike in the rate of change in affect during our observation time, followed by a gradual decay in the rate of change back to baseline in the time in-between observations. This can cause problems when used with specific study designs (e.g. unequal time intervals). Thus, a solution that is more generally appropriate is desirable.
+
+To do this, we need to specify a latent (intervention) process which is impacted by our observed intervention variable, and in turn impacts our affect process *during and in-between our observations*. This latent intervention process, can have its own autoregressive parameter which allows us to specify an accelerating, dissipating, or stable effect across continuous time. That is if the autoregressive parameter is set to 0, then our latent intervention variable will remain at a stable value and exert a stable effect on a person's rate of affect change over time. If the autoregressive parameter is set to negative value (e.g. -0.1) then the effect of the our intervention will dissipate over time. If it is set to a value greater than 0, the effect of our intervention will accumulate over time (e.g. 0.1). In our example, we will demonstrate an intervention with a persistent effect over time that is administered during the halfway mark of our observed timeline.
+
+## Simulation: Nonlinear Change with a Persistent External Shock (Continuous Time)
+
+In our data generating block, we now have the effect of our input variable `M`, which will directly impact our the state of our latent intervention process `InputState`. That is, the rate of change `dInput` in `InputState` will be a function of the prior `InputState` (multiplied by its autoregression `AM`, in this case 0) plus the intervention effect `M`. The intervention effect `M` is only non-zero, during the time of the intervention. Thus `dInput = AM*InputState` for all other time points, except Nobs = 50 when `dInput = AM*InputState + M`. Because our autoregressive parameter for the latent intervention variable is 0, the rate of change in the latent intervetion variable is 0 on all occassions except during the time of the intervention effect when `dInput = M`. The `InputState` for each time step is then given by `InputState <- InputState + dInput * 1/Nsteps`. Thus, the `InputState` is 0 up until the intervention, and then it is -0.4 (`M`).
+
+To model the impact of our latent intervention process on our affect process, we make the rate of change in affect dependent on the state of the intervention process at the current moment `dAffect <- A*AffectState + B + InputState`.
+
+```{r dataInputPersistent}
+# Generate data for multiple subjects with individual differences
+NSubjects <- 20
+times <- seq(from=0, to=100, by=1) #generate sequence of time points when subjects are measured
+Nobs <- length(times) #number of observations per subject
+initialAffect <- rnorm(n = NSubjects, mean = 5, sd = 2)
+A <- -.1 #continuous time state dependence
+B <- 1 #continuous intercept
+G <- .2 #system noise coefficient
+M <- -0.4 #input variable
+AM <- 0 #latent input process autoregression
+inputTime <- times[ceiling(length(times)/2)] #intervention after ~ 1/2 of time window passed
+
+#create empty data.frame to fill step by step
+data <- data.frame(Subject= rep(NA,NSubjects*Nobs), 
+  Time = rep(NA,NSubjects*Nobs), 
+  Affect = rep(NA,NSubjects*Nobs))
+
+Nsteps <- 100 #number of steps in time to compute between each observation (increased computational accuracy)
+
+row <- 0 #initialize row counter, to track which row of the data.frame we are on
+for(subi in 1:NSubjects){
+  for(obsi in 1:Nobs){ #for each observation of a subject
+    row <- row + 1
+    if(obsi==1){ 
+      AffectState <- initialAffect[subi] #if first time point, set to initial affect
+      InputState <- 0 # initialize latent input process
+    }
+    if(obsi>1){ #else compute new affect state by taking a sequence of small steps in time
+      for(stepi in 1:Nsteps){ #take Nsteps in time between each observation
+        
+        # Compute intervention effect
+        dInput <- AM*InputState # compute deterministic slope of our intervention at earlier time point
+        if(times[obsi]==inputTime) dInput <- dInput + M # add input effect if intervention time
+        
+        InputState <- InputState + dInput * 1/Nsteps # update state using slope and time step
+        
+        # Compute Affect state
+        dAffect <- A*AffectState + B + InputState # compute deterministic slope of affect at earlier time point
+        AffectState <- AffectState + dAffect * 1/Nsteps + # update state using slope and time step
+        G * rnorm(n=1, mean=0, sd=sqrt(1/Nsteps)) # and add system noise
+        
+      }
+    }
+    data$Affect[row] <- AffectState #input affect data
+    data$Time[row] <- times[obsi] #input time data
+    data$Subject[row] <- subi #input subject data
+    data$Input <- ifelse(data$Time == inputTime, 1, 0) #input effect data
+    data$InputState[row] <- InputState #input latent intervention process data
+  }
+}
+
+data$Affect <- data$Affect + rnorm(n=nrow(data), mean = 0, sd = .05) #add measurement error
+
+ggplot(data, # Plot the data
+  aes(x = Time, y = Affect, color = as.factor(Subject))) +
+  geom_line() +
+  geom_point() +
+  theme_bw()+
+  labs(title = "State-Dependent Increase in Affect with Fluctuations", 
+    x = "Time (weeks)", y = "Affect")+
+  theme(legend.position = "none")
+```
+
+## Fitting a model: Nonlinear Change with a Persistent External Shock (Continuous Time)
+
+We want to specify a latent intervention process that only captures the effect of our observed intervention variable, without any extra noise or baseline effects. To do this, we set all the extra influences on the latent intervention process, that do not come directly from the observed intervention variable, to 0. Thus, we set the random fluctuations (`DIFFUSION`) to zero for our latent intervention process. We also set its starting value to 0, by fixing the `T0MEANS` and `T0VAR` to zero for our latent intervention process. Finally, we fix its continuous intercept to zero `CINT` since there is no constant growth in the latent intervention process.
+
+Next, we set the cross-effect of our latent process to 1 using our `DRIFT` matrix (row 1, column 2 = 1). This, specifies a direct effect of the current state of the latent intervention process on the rate of change in our affect process.
+
+Lastly, we set specify a direct effect of the observed intervention process on our latent intervention process, but not on our latent affect process (`TDPREDEFFECT = matrix(c(0,"LatentInput"), nrow=2, ncol=1)`). Thus, our observed intervention directly impact the latent intervention process, which in turn directly impact our latent affect process. 
+
+```{r modelInputPersistent,message=FALSE,results=FALSE}
+# Fit continuous time structural equation model
+ct_model <- ctModel( #define the ctsem model
+  manifestNames = "Affect", #names of observed variables in dataset
+  latentNames = c("Affect","LatentInput"), #names of latent processes
+  TDpredNames = 'Input', #names of time dependent predictors in dataset
+  time = 'Time', #name of time column in dataset
+  id = 'Subject', #name of subject column in dataset
+  type='ct', #use continuous time / differential equation model (standt for discrete-time / regression model)
+  MANIFESTVAR = 'residualSD', #sd of the residual / measurement error
+  LAMBDA = matrix(1,nrow=1,ncol=2), #relating latent process to observed variables
+  MANIFESTMEANS=0, #no measurement intercept / offset needed (1 observed variable relates directly to latent)
+  CINT=c('B||FALSE', "0||FALSE"), #continuous intercept with *no* random effects for Affect, no CINT for latent input
+  TDPREDEFFECT = matrix(c(0,"LatentInput"), nrow=2, ncol=1),
+  T0MEANS=c("initialAffect||TRUE", "0||FALSE"), #initial affect with random effects, latent input starts at 0
+  T0VAR=matrix(c("T0VARAffect",0,0,0), nrow=2, ncol=2),
+  DRIFT = matrix(c('stateDependence', 1,
+                    0, 0), nrow = 2, ncol = 2, byrow = TRUE),
+  DIFFUSION = matrix(c('systemNoise',0,
+                        0, 0), nrow = 2, ncol =2, byrow = TRUE))
+
+ctModelLatex(ct_model) #generate LaTeX representation of the model
+```
+
+```{r fitInputPersistent}
+ct_fit <- ctStanFit(datalong = data, ctstanmodel = ct_model) #fit the model to our data
+summary(ct_fit, parmatrices=FALSE) #print summary of the fit, some output disabled
+```
+
+```{r visualInputPersistent}
+ctKalman(fit = ct_fit, plot=TRUE, subjects = 3, kalmanvec=c('y','yprior'), removeObs = 5)
+```
+
+
 
