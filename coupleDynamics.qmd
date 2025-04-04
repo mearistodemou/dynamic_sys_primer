@@ -7,7 +7,15 @@ author:
     orcid: 0000-0002-4174-2970
     email: charles.driver@psychologie.uzh.ch
     affiliations:
-        
+      - name: University of Zurich
+        department: Department of Psychology
+        address: Binzmühlestrasse 14, Box 28
+        region: Zurich
+        postal-code: 8057
+  - name: Michael Aristodemou
+    corresponding: false  # Change to true if he should be listed as a corresponding author
+    orcid:  0000-0003-0420-2702
+    affiliations:
       - name: University of Zurich
         department: Department of Psychology
         address: Binzmühlestrasse 14, Box 28
@@ -128,7 +136,7 @@ By viewing Jill's model-implied growth process it strikes us that we have no ide
 The equation for a linear model which allows people to vary in their initial affect level and rate of change, looks very similar to the linear regression model presented above but includes an $i$ subscript to indicate that each person has their own initial level ($\eta_{t0i}$) and rate of change ($B_{i}t$) of affect:
 
 $$ y_i(t) = \eta_{t0i} + B_i t + \epsilon_i(t) $$
-This model is commonly termed a linear mixed-effects model [@hoffman_catching_2022], because it includes both fixed effects (parameters that are assumed to be the same across all subjects, often interpreted as population-level effects) and random effects (parameters that allow for individual variations, such as subject-specific intercepts $\eta_{t0i}$ or slopes $B_i t$).
+This model is commonly termed a linear mixed-effects model [@hoffman2022catching], because it includes both fixed effects (parameters that are assumed to be the same across all subjects, often interpreted as population-level effects) and random effects (parameters that allow for individual variations, such as subject-specific intercepts $\eta_{t0i}$ or slopes $B_i t$).
 
 ## Simulation: A linear change model with individual differences
 
@@ -299,7 +307,7 @@ Our figure shows a nonlinear increase in affect over time. This is a better repr
 
 # A conceptual shift to continuously evolving processes
 
-Our model now provides a more realistic depiction of Jill's growth in affect from week to week. But what happens in between each of our weekly observations? One possibility is that affect stays flat and suddenly jumps during each of our weekly observations. That is, change only happens when we are looking. If we try to imagine such a discretely changing affect process, it would look like a staircase of affect. The alternative possibility is that people's affect changes continuously across time, forming a coherent trajectory. The rate of change that we observe from week to week, is then an aggregate of all the moment-to-moment changes that happen between our weekly observations. If the second option is more akin to our expectation of reality, then we need to shift to a continuous time framework. For issues that arise when modeling continuous processes using discrete-time models we refer the reader to [@driver_inference_2024].
+Our model now provides a more realistic depiction of Jill's growth in affect from week to week. But what happens in between each of our weekly observations? One possibility is that affect stays flat and suddenly jumps during each of our weekly observations. That is, change only happens when we are looking. If we try to imagine such a discretely changing affect process, it would look like a staircase of affect. The alternative possibility is that people's affect changes continuously across time, forming a coherent trajectory. The rate of change that we observe from week to week, is then an aggregate of all the moment-to-moment changes that happen between our weekly observations. If the second option is more akin to our expectation of reality, then we need to shift to a continuous time framework. For issues that arise when modeling continuous processes using discrete-time models we refer the reader to [@driver2024inference].
 
 ## Differential equations -- the mathematics of continuous time
 To formally represent continuously changing processes we need to use differential equations. But even without a technical understanding of differential equations researchers can form an intuitive understanding of continuous processes and apply them to their own substantive domain.
@@ -1483,11 +1491,10 @@ We can see that our model explains a very high amount of the variance in our obs
 
 But this can also be assessed. We already extracted the residuals from our model and we can check their autocorrelation. Autocorrelated residuals indicate that our model leaves some predictable structure unexplained. While residuals that are not correlated are more likely to just be random noise.
 
-We can create a plot of the autocorrelation between residuals to visualize whether our model is missing any systematic patterns in our data. To do this we use the `expct` function.
+We can create a plot of the autocorrelation between residuals to visualize whether our model is missing any systematic patterns in our data. To do this we use the `ctACFresiduals` function.
 
 ```{r ctsem1-getresidual_lin}
-invisible(expct(dataset = k, Time = 'Time', ID = 'Subject', outcome = c('Affect'),
-                plot_show = TRUE, Tpred = 1:10, k = 5, output_type = "PE"))
+ctACFresiduals(ct_fit) #plot autocorrelation of residuals
 ```
 
 From the plot we can see that there is a high autocorrelation between residuals, about 0.6 between temporally adjacent residuals. So now we know two things: (1) Our model is doing a good job at capturing most of the systematic patterns in our data, (2) there is still room for improvement. The natural follow-up question is what should we improve? To get an idea of model misspecification we can generate data based on the parameter estimates of our model and plot those against our observed data.
@@ -1564,8 +1571,7 @@ print(R_squared)
 Indeed, we can see that our model explains 89 percent of the variance in our data. That is 15 percent more than before! So now we can go view our autocorrelation plot to check if there is still information left in the residuals that our model could explain.
 
 ```{r ctsem1-getresidual_sd}
-invisible(expct(dataset = k, Time = 'Time', ID = 'Subject', outcome = c('Affect'),
-                plot_show = TRUE, Tpred = 1:10, k = 5, output_type = "PE"))
+ctACFresiduals(ct_fit) #plot autocorrelation of residuals
 ```
 
 We can see that the autocorrelation has also dropped substantially, but there is still a moderate amount of autocorrelation in our residuals. Which is rightly telling us that there is more predictable variation that our model can leverage. So let's try to find out what it is by plotting the model generated data over our observed data.
@@ -1634,8 +1640,7 @@ print(R_squared)
 ```
 
 ```{r ctsem1-getresidual_dg}
-invisible(expct(dataset = k, Time = 'Time', ID = 'Subject', outcome = c('Affect'),
-                plot_show = TRUE, Tpred = 1:10, k = 5, output_type = "PE"))
+ctACFresiduals(ct_fit) #plot autocorrelation of residuals
 ```
 
 ```{r ppc-modelmisspec_dg}
@@ -1659,7 +1664,7 @@ ggplot(gendat,aes(y=value,x=Time))+
 
 Overall, we can see that fitting the model to the data it generated leads to a greater $R^2$, a near-zero autocorrelation between residuals, and a model-implied trajectory that maps as perfectly as we can wish for onto the observed trajectory.
 
-In empirical contexts, this process is going to be more complicated and a data-driven method to iterative model improvement runs the risk of making model modifications that explain chance characteristics of the data. Thus, raising questions about generalizability to other samples and the population of interest. To mitigate such concerns, tools to circumvent overfitting can be used, such as iteratively building a model using a subsample of the data and then evaluating the model on unseen data (for more examples see @yarkoni_choosing_2017).
+In empirical contexts, this process is going to be more complicated and a data-driven method to iterative model improvement runs the risk of making model modifications that explain chance characteristics of the data. Thus, raising questions about generalizability to other samples and the population of interest. To mitigate such concerns, tools to circumvent overfitting can be used, such as iteratively building a model using a subsample of the data and then evaluating the model on unseen data (for more examples see @yarkoni2017choosing).
 
 # Conclusion
 
