@@ -1,51 +1,113 @@
 ---
 title: "Dynamic Systems Simulation and Modelling With R, ctsem, and lme4: Couples' Affect Dynamics Over Time"
 shorttitle: "Dynamic Systems Simulation and Modelling in R"
+
 author:
   - name: Charles C. Driver
     corresponding: true
     orcid: 0000-0002-4174-2970
     email: charles.driver@psychologie.uzh.ch
+    roles:  # pick what really applies
+      - conceptualization
+      - methodology
+      - software
+      - validation
+      - writing
+      - visualization
     affiliations:
-      - name: University of Zurich
+      - id: uzh
+        name: University of Zurich
         department: Department of Psychology
         address: Binzmühlestrasse 14, Box 28
+        city: Zurich
         region: Zurich
+        country: Switzerland
         postal-code: 8057
+
   - name: Michael Aristodemou
-    corresponding: false  # Change to true if he should be listed as a corresponding author
-    orcid:  0000-0003-0420-2702
+    orcid: 0000-0003-0420-2702
+    roles:
+      - formal analysis
+      - writing
     affiliations:
-      - name: University of Zurich
-        department: Department of Psychology
-        address: Binzmühlestrasse 14, Box 28
-        region: Zurich
-        postal-code: 8057
-abstract: "Understanding how people change is a fundamental goal of psychological science. However, translating complex ideas about psychological dynamics into formal models can be challenging without the right tools. In this tutorial, we introduce a workflow that leverages R and the ctsem package to help researchers build and understand dynamic systems models that capture the complexity of psychological processes. Our workflow emphasizes iterative model-building through simulations, model fitting, and visualizations of the model-implied dynamics alongside their fit to data. We begin with familiar linear models in lme4 and gradually transition to ctsem, which allows us to incorporate complexities such as state-dependent change, random fluctuation that are distinct from measurement error, covariate effects, interactions, and external inputs. These modeling concepts are illustrated using a running example of affect dynamics in couples therapy, demonstrating how key conceptual and methodological ideas in dynamic systems modeling come together. Our aim is to provide a general framework for understanding dynamic systems modeling and to encourage further exploration of theory-driven statistical approaches in psychological research."
-keywords: [dynamic systems, continuous time, hierarchical modeling, longitudinal data analysis, affect dynamics, ctsem, lme4, state-space models]
+      - ref: uzh
+
+# --- front-matter extras ------------------------------------------------------
+
+blank-lines-above-author-note: 2
+
 author-note:
   disclosures:
-    conflict of interest: The author has no conflict of interest to declare.
-bibliography: ctsemAffectiveDynamics.bib     
-execute:
-  warning: false
+    conflict-of-interest: The authors have no conflicts of interest to disclose.
+
+abstract: |
+  Understanding how people change is a fundamental goal of psychological science. However, translating complex ideas about psychological dynamics into formal models can be challenging without the right tools. In this tutorial, we introduce a workflow that leverages R and the ctsem package to help researchers build and understand dynamic systems models that capture the complexity of psychological processes. Our workflow emphasizes iterative model-building through simulations, model fitting, and visualizations of the model-implied dynamics alongside their fit to data. We begin with familiar linear models in lme4 and gradually transition to ctsem, which allows us to incorporate complexities such as state-dependent change, random fluctuation distinct from measurement error, covariate effects, interactions, and external inputs. These modelling concepts are illustrated using a running example of affect dynamics in couples therapy, demonstrating how key conceptual and methodological ideas in dynamic systems modelling come together. Our aim is to provide a general framework for understanding dynamic systems modelling and to encourage further exploration of theory-driven statistical approaches in psychological research.
+
+keywords:
+  - dynamic systems
+  - continuous time
+  - hierarchical modeling
+  - longitudinal data analysis
+  - affect dynamics
+  - ctsem
+  - lme4
+  - state-space models
+
+impact-statement: |
+  This tutorial shows how psychological researchers can use R and the ctsem package to build and understand dynamic systems models that capture the complexity of psychological processes. By providing a structured approach to model building, we aim to facilitate the translation of theoretical concepts into empirical models, ultimately enhancing our understanding of psychological concepts and their interrelations over time.
+
+word-count: false          # leave true if journal asks for automatic word count
 floatsintext: true
-format: 
-  html:
+numbered-lines: false
+first-page: 1
+
+# --- references --------------------------------------------------------------
+
+bibliography: ctsemAffectiveDynamics.bib
+link-citations: true
+mask: false
+
+# --- localisation -------------------------------------------------------------
+
+lang: en
+language:
+  citation-last-author-separator: "and"
+
+no-ampersand-parenthetical: false     # keep APA style ampersands in () citations
+
+# --- execution options -------------------------------------------------------
+
+execute:
+  fig-format: png
+  fig-dpi: 300
+  dev: png
+
+# --- output formats ----------------------------------------------------------
+
+format:
+  apaquarto-html:
     toc: true
     toc-expand: true
     embed-resources: true
     page-layout: full
     code-fold: show
     number_sections: true
-  pdf: 
-    documentmode: jou
+  apaquarto-docx:
+    toc: false
+  apaquarto-pdf:
+    documentmode: doc    # journal (two-column) mode; use man for manuscript
+    font-size: 10pt
     a4paper: true
+    keep-tex: true       # drop when production‐ready
+
+# --- misc --------------------------------------------------------------------
+
 editor: source
-self-contained: true
-editor_options: 
+self-contained-math: true
+editor_options:
   chunk_output_type: console
 ---
+
 
 ```{r setup, include=FALSE}
 default_chunk_hook  <- knitr::knit_hooks$get("chunk")
@@ -72,10 +134,10 @@ library(ggplot2)
 library(ctsem)
 library(lme4)
 library(data.table)
-library(expct)
 
-dir.create('tex',showWarnings = FALSE)
-texdir='./tex'
+#create a tempdir for tex files and track it's location
+dir.create('textemp',showWarnings = FALSE)
+texdir='./textemp'
 ```
 
 # Introduction
@@ -528,18 +590,12 @@ ct_model <- ctModel( #define the ctsem model
 
 For readers that prefer to view the entire model equation, we can generate a LaTeX formatted represention of the equations we just specified by running the `ctModelLatex()` function. To do this we need to install the following package the `tinytex`, if we have not already done so. Sometimes there are difficulties getting LaTeX compilation to work on various systems. For those who have difficulties, generally installing the R package `tinytex` via `install.packages('tinytex')`, then running `tinytex::install_tinytex()`, will be sufficient. In case of errors along the way, restarting R / Rstudio and clearing the workspace can help. For those that do not want the trouble of potential troubleshooting, the output can be found below.
 
-```{r TEX2,echo=FALSE,out.width='100%',cache=F}
-#if (!tinytex::is_tinytex()) {
-#    tinytex::install_tinytex()
-#}
+```{r TEX1,echo=FALSE,out.width='100%',cache=F}
 
 ctModelLatex(ct_model,textsize = 'small', folder=texdir,
-  filename = 'tex2',open=FALSE)
+  filename = 'tex1',open=FALSE,savepng=TRUE)
 
-bitmap <- pdftools::pdf_render_page(file.path(texdir,'tex2.pdf'),dpi=300)
-png::writePNG(bitmap, file.path(texdir,'tex2.png'))
-
-knitr::include_graphics(file.path(texdir,'tex2.png'),dpi=300)
+knitr::include_graphics(file.path(texdir,'tex1.png'),dpi=300)
 ```
 
 We can now fit the model and ask for a summary of the parameter estimates.
@@ -800,10 +856,7 @@ Below we generate the model equations, for a clearer view of the entire model st
 
 ```{r TEX3,echo=FALSE,out.width='100%',cache=F}
 ctModelLatex(ct_model,textsize = 'small', folder=texdir,
-  filename = 'tex3',open=FALSE)
-
-bitmap <- pdftools::pdf_render_page(file.path(texdir,'tex3.pdf'),dpi=300)
-png::writePNG(bitmap, file.path(texdir,'tex3.png'))
+  filename = 'tex3',open=FALSE,savepng=TRUE)
 
 knitr::include_graphics(file.path(texdir,'tex3.png'),dpi=300)
 ```
@@ -1239,12 +1292,9 @@ ctModelLatex(ct_model) #generate LaTeX representation of the model
 
 ```{r texInputSimple,echo=FALSE,out.width='100%',cache=F}
 ctModelLatex(ct_model,textsize = 'small', folder=texdir,
-  filename = 'tex2',open=FALSE)
+  filename = 'texInputSimple',open=FALSE,savepng=TRUE)
 
-bitmap <- pdftools::pdf_render_page(file.path(texdir,'tex2.pdf'),dpi=300)
-png::writePNG(bitmap, file.path(texdir,'tex2.png'))
-
-knitr::include_graphics(file.path(texdir,'tex2.png'),dpi=300)
+knitr::include_graphics(file.path(texdir,'texInputSimple.png'),dpi=300)
 ```
 
 Looking at the model, note that we now have a time dependent predictor effect -- this is the input effect `td_Affect_Input`. 
@@ -1669,3 +1719,5 @@ In empirical contexts, this process is going to be more complicated and a data-d
 # Conclusion
 
 Modern computational tools and software packages such as `ctsem` simplify the process of building intricate statistical models to meet the surge of interest in intensive longitudinal data. However, the interpretation of complicated models still remains challenging despite the increasing ease of their implementation. In this tutorial, we have provided psychological researchers a set of tools to aid in the interpretation of complex model structures that better approximate the complexity of the human dynamic systems.
+
+
