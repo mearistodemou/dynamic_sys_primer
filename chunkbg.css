@@ -1,0 +1,5 @@
+.cell-output-stdout {background-color: #f7edd7}
+.cell .sourceCode,
+pre.sourceCode {               /* non-executed fenced blocks too */
+  background-color: #d0e5f5;   /* pick your color */
+}
