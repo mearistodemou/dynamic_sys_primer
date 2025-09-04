@@ -193,8 +193,8 @@ dir.create("textemp", showWarnings = F)
 texdir <- "./textemp"
 
 ## TO DO
-Remove unnecessary code / plots / summary output
-Check R^2 content -- can be attained from $ResidCovStd in summary
+#Remove unnecessary code / plots / summary output
+#Check R^2 content -- can be attained from $ResidCovStd in summary
 ```
 
 # Introduction
