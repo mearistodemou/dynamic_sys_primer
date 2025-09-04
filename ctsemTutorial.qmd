@@ -191,6 +191,10 @@ library(data.table)
 # create a tempdir for tex files and track its location
 dir.create("textemp", showWarnings = F)
 texdir <- "./textemp"
+
+## TO DO
+Remove unnecessary code / plots / summary output
+Check R^2 content -- can be attained from $ResidCovStd in summary
 ```
 
 # Introduction
