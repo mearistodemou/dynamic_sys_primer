@@ -1,5 +1,5 @@
 ---
-title: "Dynamic Systems Simulation and Modelling With R, ctsem, and lme4: Couples' Affect Dynamics Over Time"
+title: "A Tutorial in Dynamic Systems Simulation and Modelling With R, ctsem, and lme4: Couples' Affect Dynamics Over Time"
 shorttitle: "Dynamic Systems Simulation and Modelling in R"
 
 author:
@@ -1511,7 +1511,7 @@ ctKalman(fit = ct_fit, plot=TRUE, subjects = 3, kalmanvec=c('y','yprior'), remov
 # Model evaluation and comparison
 To end this tutorial, we are going to investigate how to evaluate and compare different model structures when we do not know the structure of our observed data. In empirical settings, this can be a very difficult and fascinating problem that requires deep inquiry. To get people started on their journey of model evaluation, we will showcase some tools that can help determine whether a model provides a good representation of the data and whether it is better than any competing explanations (models) we may have. We will begin from a familiar starting place, and then enrich our model evaluation by introducing new tools. 
 
-The most common form of model evaluation happens using a very simple method known as the $R^2$ [@NakagawaSchielzeth2013]. The $R^2$ tells us how much of the total variance in our data is explained by our model by dividing the residual (unexplained) variance ($V\hat{y}$) by the total observed variance($Vy$).
+The most common form of model evaluation happens using a very simple method known as the $R^2$ [@NakagawaSchielzeth2013]. The $R^2$ tells us how much of the total variance in our data is explained by our model by dividing the residual (unexplained) variance ($V\hat{y}$) by the total variance($Vy$). Because the total variance is not necessarily constant across individuals or time, this is computed using standardized residuals, and reported (as standardized residual variance) at the top of the ctsem summary output. 
 
 So let's imagine that after all the model building we have done, we still think that the best representation of an affect process is a linear model in continuous time. If we have data from 20 patients over 21 weeks, we can use the $R^2$ estimate to check whether our model explains a substantial amount of variance in our data (what counts as substantial is a topic for another paper). We will generate the data and pretend it is observed, because knowing the answers simplifies the process of understanding model evaluation. So we will generate data using from a continuous-time model with state dependency and random fluctuations.
 
@@ -1598,22 +1598,7 @@ ct_fit <- ctStanFit(datalong = data, ctstanmodel = ct_model) #fit the model to o
 summary(ct_fit, parmatrices=FALSE) #print summary of the fit, some output disabled
 ```
 
-Now we can use the $R^2$ estimate to see how much of the variance in our 'observed' data our model has accounted for. To get the $R^2$ we first need to extract the residuals. In `ctsem` this is done using the `ctKalman` function to extract model-based estimates and then a sub-setting step to only keep the residuals `k=k[k$Element %in% 'errprior',]`. Then we just use the variance of the residuals and divide it over the variance of our observations, to get the $R^2$, `R_squared <- 1 - (y_hatVAR / yVAR)`.
-
-```{r ctsem1-getrR^2_lin}
-# Extract residuals
-k=ctKalman(ct_fit, subjects=unique(data$Subject)) #get residuals and various estimates
-k=k[k$Element %in% 'errprior',] #remove everything except the residuals
-k=dcast(data = data.table(k), formula = formula('Subject + Time ~ Row')) #cast to wider format
-
-# estimate R-squared
-y_hatVAR = sum(k$Affect^2, na.rm = TRUE)
-yVAR <- sum((data$Affect - mean(data$Affect))^2)
-R_squared <- 1 - (y_hatVAR / yVAR)
-print(R_squared)
-```
-
-We can see that our model explains a very high amount of the variance in our observations. This is because it is almost the same model as the model that generated our data. At this point, in most empirical circumstances we would go home very satisfied with our model. Explaining approximately 75 percent of the variance could mean that the remaining variance is simply noise.
+Now we can use the standardized residual variance estimate (reported at the top of summary under 'ResidCovStd', equivalent to 1 - $R^2$) to see how much of the variance in our empirical data our model has accounted for. We can see that our model explains a very high amount of the variance in our observations. This is because it is almost the same model as the model that generated our data. At this point, in many empirical circumstances we would go home very satisfied with our model. Explaining almost 80 percent of the variance could mean that the remaining variance is simply noise.
 
 But this can also be assessed. We already extracted the residuals from our model and we can check their autocorrelation. Autocorrelated residuals indicate that our model leaves some predictable structure unexplained [@Gelman1996PPC]. While residuals that are not correlated are more likely to just be random noise.
 
@@ -1671,22 +1656,7 @@ ct_fit <- ctStanFit(datalong = data, ctstanmodel = ct_model) #fit the model to o
 summary(ct_fit, parmatrices=FALSE) #print summary of the fit, some output disabled
 ```
 
-Now we can again see if adding this state-dependence term has helped us explain more variance in our data by computing the $R^2$. 
-
-```{r ctsem1-getR^2_sd}
-# Extract residuals
-k=ctKalman(ct_fit, subjects=unique(data$Subject)) #get residuals and various estimates
-k=k[k$Element %in% 'errprior',] #remove everything except the residuals
-k=dcast(data = data.table(k), formula = formula('Subject + Time ~ Row')) #cast to wider format
-
-# estimate R-squared
-y_hatVAR = sum(k$Affect^2, na.rm = TRUE)
-yVAR <- sum((data$Affect - mean(data$Affect))^2)
-R_squared <- 1 - (y_hatVAR / yVAR)
-print(R_squared)
-```
-
-Indeed, we can see that our model explains 89 percent of the variance in our data. That is 15 percent more than before! So now we can go view our autocorrelation plot to check if there is still information left in the residuals that our model could explain.
+Now we can again see if adding this state-dependence term has helped us explain more variance in our data by considering the $R^2$ -- and indeed, we can see that we have around 10% residual variance, or 90% explained variation in our data -- noticeably more than before. So now we can go view our autocorrelation plot to check if there is still information left in the residuals that our model could explain.
 
 ```{r ctsem1-getresidual_sd,cache=TRUE}
 ctACFresiduals(ct_fit) #plot autocorrelation of residuals
@@ -1736,19 +1706,6 @@ ct_fit <- ctStanFit(datalong = data, ctstanmodel = ct_model) #fit the model to o
 summary(ct_fit, parmatrices=FALSE) #print summary of the fit, some output disabled
 ```
 
-```{r ctsem1-getR^2_dg}
-# Extract residuals
-k=ctKalman(ct_fit, subjects=unique(data$Subject)) #get residuals and various estimates
-k=k[k$Element %in% 'errprior',] #remove everything except the residuals
-k=dcast(data = data.table(k), formula = formula('Subject + Time ~ Row')) #cast to wider format
-
-# estimate R-squared
-y_hatVAR = sum(k$Affect^2, na.rm = TRUE)
-yVAR <- sum((data$Affect - mean(data$Affect))^2)
-R_squared <- 1 - (y_hatVAR / yVAR)
-print(R_squared)
-```
-
 ```{r ctsem1-getresidual_dg,cache=TRUE}
 ctACFresiduals(ct_fit) #plot autocorrelation of residuals
 ```
@@ -1765,6 +1722,14 @@ print(postpred[[2]]) #print second plot -- compares expectations / variation ove
 Overall, we can see that fitting the model to the data it generated leads to a greater $R^2$, a near-zero autocorrelation between residuals, and a model-implied trajectory that maps as perfectly as we can wish for onto the observed trajectory.
 
 In empirical contexts, this process is going to be more complicated and a data-driven method to iterative model improvement runs the risk of making model modifications that explain chance characteristics of the data. Thus, raising questions about generalizability to other samples and the population of interest. To mitigate such concerns, tools to circumvent overfitting can be used, such as iteratively building a model using a subsample of the data and then evaluating the model on unseen data (for more examples see @yarkoni2017choosing).
+
+# Further Works and Resources
+
+Beyond the core ctsem workflow, several tutorials and reviews map the broader longitudinal modeling landscape and can help with the array of choices to be made in linking theory to models and data. For discrete-time foundations, a concise, practice-oriented overview of growth curve models addresses common pitfalls and implementation details [@curran2010twelve]. For intensive longitudinal data that blur boundaries between multilevel models, time series, and SEM, dynamic structural equation modeling (DSEM) provides an integrated framework with worked examples and diagnostics [@asparouhov2018dynamica]. Bridging discrete- and continuous-time perspectives, step‑by‑step introductions show how cross‑lagged and autoregressive panel models can be translated into their continuous‑time counterparts with stochastic differential equations and estimated within SEM [@Voelkle2012CTSEM], including guidance for irregular sampling and oscillatory processes [@Voelkle2012CTSEM]. For researchers using cross‑lagged panel models specifically, some criticisms clarify interpretational limits and motivates model choices that better align statistical parameters with substantive within‑person processes [@berry2017practical; @hamaker2015critiquea].
+
+For dynamic-systems modeling that formalizes change mechanisms directly as differential (or stochastic differential) equations, there are other accessible software and methodological resources. The dynr package paper provides a hands‑on introduction to specifying linear/nonlinear, discrete/continuous‑time models (including regime switching) with code recipes and estimation details [@ou2019whats]. Methodological tutorials demonstrate hierarchical stochastic differential equation models for affect dynamics, highlighting how drift and diffusion parameters map to psychological regulation and noise [@oravecz2011hierarchical], and how short and long term timescales may be considered in the one model [@boker2024separating]. 
+
+Linking theory to model requires explicit mappings from theoretical constructs to parameters, along with clearly stated scope conditions and levels of analysis, some general guidelines of which can be found in @wilson2019ten. A range of works explore how formal models can serve, inform, or be tested against theories, and advocates using formal models as a practical toolkit for theory construction [@haslbeck2022modeling; @robinaugh2021invisible]. Recent proposals to integrate intra‑ and interindividual phenomena make these mappings explicit, clarifying which parameters encode within‑person dynamics versus between‑person structure and how each bears on theoretical claims [@borsboom2024integrating]. For panel designs, careful attention to time scale and confounding is crucial: cross‑lagged effects are often misinterpreted when temporal assumptions are mismatched or when time‑invariant confounders are not handled appropriately; guidance is available for diagnosing these issues and providing more defensible causal interpretations [@driver2025inference; @rohrer2023these]. Finally, when theories posit continuous change, formalizing them as continuous‑time systems can yield parameters (e.g., drift, diffusion) that align more directly with hypothesized mechanisms and developmental relations [@driver2023formalizing].
 
 # Conclusion
 
