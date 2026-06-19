@@ -41,15 +41,7 @@ author-note:
     conflict-of-interest: The authors declare that they have no conflicts of interest to disclose.
 
 abstract: |-
-  Understanding how people change is a fundamental goal of psychological science. However, translating complex ideas about psychological dynamics into formal models can be challenging
-  without the right tools. In this tutorial, we introduce a workflow that leverages R and the ctsem package to help researchers build and understand dynamic systems models that capture the complexity of psychological processes. Our workflow emphasizes iterative model-building through simulations, model fitting, and visualizations of the model-implied dynamics alongside their fit to data. We begin with familiar linear models in lme4 and gradually transition to ctsem,
-  which allows us to incorporate complexities such as state-dependent change, random fluctuation
-  distinct from measurement error, covariate effects, interactions, and external inputs. These
-  modelling concepts are illustrated using a running example of affect dynamics in couples
-  therapy, demonstrating how key conceptual and methodological ideas in dynamic systems modelling
-  come together. Our aim is to provide a general framework for understanding dynamic systems
-  modelling and to encourage further exploration of theory-driven statistical approaches in
-  psychological research.
+  Understanding how people change is a fundamental goal of psychological science. However, translating complex ideas about psychological dynamics into formal models can be challenging without the right tools. In this tutorial, we introduce a approaches using R and the ctsem package to help researchers build and understand dynamic systems models that capture some of the complexity of psychological processes. We emphasize iterative model-building through simulations, model fitting, and visualizations of the model-implied dynamics alongside their fit to data. We begin with familiar linear models in lme4 and gradually transition to ctsem, which allows us to incorporate complexities such as state-dependent change, random fluctuation distinct from measurement error, covariate effects, interactions, and external inputs. These modelling concepts are illustrated using a running example of affect dynamics in couples therapy, demonstrating how key conceptual and methodological ideas in dynamic systems modelling come together. Our aim is to provide a general framework for understanding dynamic systems modelling and to encourage further exploration of theory-driven statistical approaches in psychological research. 
 
 keywords:
   - dynamic systems
@@ -62,11 +54,7 @@ keywords:
   - state-space models
 
 impact-statement: |-
-  This tutorial shows how psychological researchers can use R and the ctsem package to build and
-  understand dynamic systems models that capture the complexity of psychological processes. By
-  providing a structured approach to model building, we aim to facilitate the translation of
-  theoretical concepts into empirical models, ultimately enhancing our understanding of
-  psychological concepts and their interrelations over time.
+  This tutorial shows how psychological researchers can use R and the ctsem package to build and understand dynamic systems models that capture the complexity of psychological processes. By providing a structured approach to model building, we aim to facilitate the translation of theoretical concepts into empirical models, ultimately enhancing our understanding of psychological concepts and their interrelations over time.
 
 word-count: false
 floatsintext: true
@@ -101,6 +89,8 @@ format:
     toc: true
     toc-expand: true
     embed-resources: true
+    self-contained-math: true
+    self-contained: true
     code-fold: show
     css: chunkbg.css
     number_sections: true
@@ -119,8 +109,6 @@ format:
 # --- misc --------------------------------------------------------------------
 
 editor: source
-self-contained-math: true
-self-contained: true
 editor_options:
   chunk_output_type: console
 ---
@@ -1322,7 +1310,7 @@ m_discmod <- ctModel(
     PARS=c('cross12base||TRUE','cross12mod||TRUE'))#extra params 
 ```
 
-```{r}
+```{r, cache=TRUE}
 f_discmod <- ctStanFit(datalong = data, ctstanmodel = m_discmod)
 s_discmod <- summary(f_discmod)
 print(s_discmod$popmeans)
@@ -1363,7 +1351,7 @@ Nobs <- length(times) #number of observations per subject
 t0Affect <- rnorm(n = NSubjects, mean = 5, sd = 2)
 A <- -.1 #continuous time state dependence
 B <- 0.5 #continuous intercept reduced, growth via therapy effect
-G <- .2 #system noise coefficient
+G <- .1 #system noise coefficient
 M <- 0.2 #input variable
 AM <- 0 #latent input process autoregression
 
@@ -1451,21 +1439,21 @@ m_persist <- ctModel(
 ```
 
 ```{r fitInputPersistent,cache=TRUE}
-f_persist <- ctStanFit(datalong = data, ctstanmodel = m_persist)
+f_persist <- ctStanFit(datalong = data, ctstanmodel = m_persist) 
 ```
 
-We can plot the smoothed estimates of the observed variable states (latent states if desired using 'etasmooth' instead of 'ysmooth') for the first three subjects in our dataset, which shows the increase in affect at the time of the intervention, with the effect persisting over time. Note here that the effect is not immediate, but accumulates and persists in comparison to the earlier example.
+We can plot the smoothed estimates of the latent variable states for the first three subjects in our dataset, which shows the increase in the accumulated therapy at the time of the intervention, which causes increases in affect over time. Here we can see the instantaneous impulse of the therapy session on accumulated therapy, and the long term growth in affect due to accumulated therapy.
 
 ```{r visualInputPersistent, out.height='30%'}
 #| label: fig-persistent-kalman
-#| fig-cap: "Smoothed Affect Estimates for Three Subjects with Persistent Therapy Input."
-ctKalman(f_persist, plot=TRUE, subjects=1:3, kalmanvec='ysmooth') 
+#| fig-cap: "Smoothed Latent Processes for Three Subjects with Accumulating Therapy Input."
+ctKalman(f_persist, plot=TRUE, subjects=1:3, kalmanvec='etasmooth') 
 ```
 
 # Model Evaluation and Comparison
 To end this tutorial, we are going to investigate how to evaluate and compare different model structures when we do not know the structure of our observed data. In empirical settings, this can be a very difficult and fascinating problem that requires deep inquiry, and we cannot cover all aspects and nuance here. To get people started with model evaluation, we will demonstrate some tools and approaches that can help determine whether a model provides a good representation of the data, and whether it is better than any competing explanations (models) we may have. 
 
-So let's imagine that after all the model building we have done, we still think that the best representation of an affect process is a linear trajectory. If we have data from 20 patients over 21 weeks, we can use the $R^2$ estimate to check how much variance in the data has been explained by the model. For our example we will generate data from a known model (simplifying the explanations) but normally the true model is not known! .
+So let's imagine that after all the model building we have done, we still think that the best representation of an affect process is a linear trajectory. If we have data from 20 patients over 21 weeks, we can use the $R^2$ estimate to check how much variance in the data has been explained by the model. For our example we will generate data from a known model (simplifying the explanations) but normally the true model is not known!
 
 ## Generating Data
 
