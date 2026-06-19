@@ -1,0 +1,18 @@
+Thank you very much for submitting your manuscript A Tutorial in Dynamic Systems Simulation and Modelling With R, ctsem, and lme4: Couples’ Affect Dynamics Over Time (MET-2026-0505)
+for review and consideration for publication in Psychological Methods. I sincerely appreciate the opportunity to review the manuscript. I have now received the reviews of your manuscript and am able to make an editorial decision at this time.
+
+Reviewers have now commented on your paper. Based on those comments, I am recommending a HIGH-RISK revision. Almost by definition, a high-risk revision is challenging to convert into a publication. However, I would not offer this opportunity for revision unless it were reasonable to do so. For your guidance, reviewers' comments are appended below, and the issues driving my editorial decision are as follows:
+
+1. Both reviewers had concerns about the paper length. I see the same. I think the paper attempts to cover too much ground; a more focused narrative would strengthen the impact. One possibility is to focus on the ctsem package, and move the rest into the appendix. 
+
+2. Also suggested by the two reviewers, the manuscript should include a dedicated discussion on the scope and boundary conditions of the proposed models. Specifically, the authors should address the 'big picture' requirements and limitations of the approach—detailing the necessary data density for complex models, identifying specific scenarios where simpler models are preferable, and acknowledging practical failure points or empirical problems that the current tutorial does not cover. 
+
+3. The tutorial relies on a simplified example concerning couples’ affect dynamics. While the example is effective pedagogically, discussions need to be given how the methodology and R package can be useful in other settings. The boundries need to be defined (related to the comment above). 
+
+If you decide to revise the work, please submit a list of changes or a rebuttal against each point which is being raised when you submit the revised manuscript.
+
+If you have not already done so as part of your Author Note, please provide the details (2-4 sentences) of prior dissemination of the ideas and data appearing in the manuscript (e.g., if some or all of the data and ideas in the manuscript were presented at a conference or meeting posted on a listserv, shared on a website, etc.).
+
+We request that your revision arrive by 21 May 2026. If for some reason you find that you cannot meet this deadline, please contact us as soon as possible in order to make other arrangements.
+
+To submit a revision, go to https://www.editorialmanager.com/met/ and log in as an Author. You will see a menu item called Submission Needing Revision. You will find your submission record there.
