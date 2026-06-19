@@ -10,7 +10,6 @@
 \setlength{\parskip}{0.55em}
 
 \newcommand{\ms}{\textit{A Tutorial in Dynamic Systems Simulation and Modelling With R, ctsem, and lme4: Couples' Affect Dynamics Over Time}}
-\newcommand{\todo}[1]{\textbf{[todo]} #1}
 \newcommand{\response}{\textbf{Response.} }
 \newcommand{\reviewerpoint}[1]{\textit{#1}}
 
@@ -29,9 +28,7 @@ Thank you for the opportunity to submit a revised version of our manuscript to \
 
 The revised manuscript now states the methodological contribution more explicitly as a workflow: theory is translated into a generative model, the model is simulated using hand-coded R functions, the corresponding statistical model is estimated, model-implied behavior is checked against the intended theory and observed data, and the specification is then revised, simplified, or extended. This workflow is not specific to \texttt{ctsem}, although \texttt{ctsem} provides a useful implementation for several of the continuous-time state-space models considered.
 
-We have therefore revised the manuscript by prioritizing and compressing the presentation rather than simply adding caveats. We condensed code-heavy passages, moved or marked later extensions as optional where feasible, reduced redundancy, added a dedicated scope and boundary section, added a compact mapping from model components to broader psychological applications, and strengthened the conclusion and troubleshooting guidance.
-
-\todo{Before submission, update this opening paragraph to reflect the exact revisions completed, add page/line numbers if required by the journal, and remove any remaining todo blocks.}
+We have therefore revised the manuscript by making the conceptual workflow, scope conditions, and generalizability more explicit rather than simply adding caveats. We added a dedicated scope and boundary section, strengthened the introduction and conclusion, clarified the transition from hand-coded simulation to state-space estimation, added section-by-section examples of broader psychological applications, and expanded practical model-checking and troubleshooting guidance.
 
 \section*{Editor}
 
@@ -39,15 +36,12 @@ We have therefore revised the manuscript by prioritizing and compressing the pre
 
 \item \reviewerpoint{Both reviewers had concerns about the paper length. The paper attempts to cover too much ground; a more focused narrative would strengthen the impact. One possibility is to focus on the ctsem package, and move the rest into the appendix.}
 
-\todo{Identify exact passages moved, shortened, or marked optional. Candidate areas: repeated code explanation, selected later extension details, some prediction plots, and highly application-specific moderator/input examples. Add page/line numbers once the manuscript is revised.}
-
 \response We agree that the original manuscript attempted to cover a wide range of material, and we have revised the paper to provide a more focused narrative. We retained the worked tutorial structure because it is central to the article's purpose: showing how dynamic systems models can be built from substantive assumptions, examined through hand-coded simulations, estimated, checked, and then revised or simplified.
 
-Concretely, we condensed code-heavy passages, reduced repeated explanations of similar plotting and fitting steps, moved or shortened later extension details where possible, and added a reader roadmap distinguishing core sections from optional extensions. We did not refocus the article solely on \texttt{ctsem}, because the paper's methodological contribution is the broader model-building workflow rather than package documentation.
+Concretely, we sharpened the reader roadmap and made the model-building workflow explicit at the outset. We did not refocus the article solely on \texttt{ctsem}, because the paper's methodological contribution is the broader workflow rather than package documentation.
+% TODO Charles: This response should be updated after a separate length/compaction pass if code or later extension details are moved to supplementary material.
 
 \item \reviewerpoint{The manuscript should include a dedicated discussion on the scope and boundary conditions of the proposed models, including data density for complex models, scenarios where simpler models are preferable, and practical failure points or empirical problems that the tutorial does not cover.}
-
-\todo{Add a dedicated ``Scope and boundary conditions'' subsection, likely near the end of the introduction and revisited before the conclusion. Include: when CT dynamic models are useful; when not to use them; data density; measurement reliability; observation timing; stationarity assumptions; missingness; floor/ceiling effects; non-Gaussian outcomes; weak identification; oversimplified models that bundle distinct influences; over-complex models; convergence/Hessian warnings; and when simpler descriptive, mixed-effects, or discrete-time models are preferable.}
 
 \response We agree and have added a dedicated discussion of scope and boundary conditions. The tutorial now states more clearly that continuous-time dynamic models are most useful when the theory concerns processes that change over time, when observation timing matters, when irregular intervals are present, or when parameters can be linked to interpretable features of an evolving system. We also added a short ``when not to use these models'' paragraph noting that simpler descriptive, mixed-effects, or discrete-time models may be preferable when the research question is not dynamic, the time scale is unknown, the data are too sparse, or the added parameters are not theoretically interpretable or empirically supported.
 
@@ -55,17 +49,13 @@ We also clarified that model complexity should be calibrated in both directions.
 
 \item \reviewerpoint{The tutorial relies on a simplified example concerning couples' affect dynamics. While effective pedagogically, the authors should discuss how the methodology and R package can be useful in other settings. The boundaries need to be defined.}
 
-\todo{Add a small table mapping model components to broader domains. Candidate rows: state dependence, coupling, time-dependent inputs, individual differences, measurement error, process noise, and moderators. Candidate domains: symptoms, stress-recovery, learning, dyadic interaction, physiology, treatment response, EMA, and developmental change.}
-
 \response We agree that the manuscript should do more to make the generality of the workflow explicit. We retained the single running example because it allows the reader to see how the same substantive system can be developed from simple to complex specifications, making the consequences of each new model component easier to understand. However, we now clarify that the example is not intended to define the limits of the method.
 
-To make this generality visible, we added a compact mapping from model components to broader applications. For example, state dependence can represent recovery, inertia, or regulation; coupling can represent interpersonal influence, symptom interactions, or links among behavioral and physiological variables; time-dependent inputs can represent interventions, events, or contextual changes; individual differences can represent heterogeneity in baselines, rates of change, or dynamic coupling; and measurement error and process noise clarify different sources of variability. We also clarify boundaries, especially that more complex specifications require stronger theory and richer data.
+To make this generality visible, we added examples throughout the section roadmap and within the relevant model sections. For example, state dependence can represent recovery, inertia, or regulation; coupling can represent interpersonal influence, symptom interactions, or links among behavioral and physiological variables; time-dependent inputs can represent interventions, events, or contextual changes; individual differences can represent heterogeneity in baselines, rates of change, or dynamic coupling; and measurement error and process noise clarify different sources of variability. We also clarify boundaries, especially that more complex specifications require stronger theory and richer data.
 
 \item \reviewerpoint{Please provide details of prior dissemination of the ideas and data appearing in the manuscript if this has not already been done.}
 
-\todo{Insert exact prior dissemination statement. If there was no prior dissemination, say so directly. If any material appeared in workshops, teaching materials, listservs, websites, OSF/GitHub, or conference presentations, describe this in 2--4 sentences in the author note and here.}
-
-\response We have added the requested prior-dissemination statement to the Author Note. \todo{Replace with exact statement once finalized.}
+\response We have added the requested prior-dissemination statement to the Author Note, noting the PsyArXiv preprint at \url{https://osf.io/preprints/psyarxiv/4q9ex_v3} and the accompanying OSF project at \url{https://osf.io/xh6ue/}.
 
 \end{enumerate}
 
@@ -79,31 +69,21 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{Explain the general rationale more at the outset. It is not obvious why the tutorial creates generative models based on theory and then recovers these models from synthetic data, rather than simply fitting successively more complex models.}
 
-\todo{Add early paragraph explaining simulation as a way to understand the implications of theory before fitting empirical data. Emphasize that data generation is not the endpoint, but a tool for learning model behavior, checking whether parameters mean what researchers think they mean, and diagnosing what different models can and cannot recover.}
-
 \response We agree. The revised introduction now explains why the tutorial begins from generative models. Simulation is not merely a convenience for producing example data; it is a way to make theoretical assumptions operational and inspect their implications before fitting models to empirical observations. All simulations in the tutorial are hand coded, including the continuous-time and dynamic-systems examples, so that readers can see how assumptions translate into trajectories before seeing the corresponding estimation model. We now state this rationale explicitly before the first examples.
 
 \item \reviewerpoint{There is a jump in difficulty when introducing ctsem. New ideas, including the latent dynamic model, are introduced too quickly, and Figure 18 is not explained in enough detail.}
-
-\todo{Soften transition into \texttt{ctsem}. Add a paragraph warning that the tutorial now shifts from hand-coded generative simulation to formal estimation in a state-space modelling framework. Define latent process, measurement model, manifest variable, process noise, and measurement error before code. Add a clearer walk-through of the relevant figure.}
 
 \response We agree that the transition was too abrupt. We revised this section to provide a clearer conceptual bridge from the hand-coded simulations to formal estimation in \texttt{ctsem}. In particular, we now motivate the latent dynamic model in terms of the running example: the affect process is treated as an underlying continuously evolving state, while the observed scores are noisy measurements of that state at particular times. We also expanded the explanation of the relevant figure and added more explicit guidance about how the state, measurement, drift, diffusion, and error components map onto the previous simulations.
 
 \item \reviewerpoint{The paper is long and contains 32 figures. It may be difficult to read in one sitting; later model details could be moved to an appendix.}
 
-\todo{Coordinate with Editor Comment 1. Record concrete compression: code-heavy passages condensed, repeated plotting/fitting details reduced, later extension details moved or marked optional, and core versus optional sections signposted.}
-
-\response We agree that the manuscript should be easier to navigate. We have revised the manuscript to sharpen the main narrative, condense code-heavy passages, reduce repeated plotting and fitting details, and distinguish core sections from optional extensions. Because this is a tutorial, we retained figures that are essential for understanding model-implied behavior, but we have aimed to make the figures work harder pedagogically and to avoid unnecessary repetition.
+\response We agree that the manuscript should be easier to navigate. In the current revision we sharpened the main narrative, strengthened the opening roadmap, and clarified the role of each model component in the tutorial sequence. Because this is a tutorial, we retained figures that are essential for understanding model-implied behavior. We will also consider a further compaction pass, particularly for code-heavy or extension-specific material, if the editor views that as necessary after these revisions.
 
 \item \reviewerpoint{Comment more on possible nonlinear models and model behavior. Can latent processes interact? The running example uses single fixed-point systems, and estimating initial states does not explain how a person arrived at the initial state.}
-
-\todo{Add brief end discussion of nonlinear extensions and limitations of the present tutorial. Focus on the reviewer's question about state-dependent moderation/latent interactions and possible nonlinear measurement models. Note that initial states describe the modelled observation window rather than explaining all prior history.}
 
 \response We agree and have added a brief discussion of nonlinear extensions that are most closely connected to the tutorial. We now note that state-dependent moderation effects could allow the influence of one process on another to depend on the current level of the processes, and that nonlinear measurement models can represent cases where the observed scale changes sensitivity across the latent range, for example producing skewed or bounded observed outcomes from a continuously changing latent process. We also clarify that estimated initial states characterize the beginning of the observed time window; they should not be interpreted as a complete model of how the person or system arrived at that state before observation began.
 
 \item \reviewerpoint{Comment on data requirements of ctsem and on the broader question of whether a whole dynamic system can always be fit to a single dataset. Discuss alternative ways to combine sources of information.}
-
-\todo{Add data requirements and alternative-evidence paragraph. Mention that model complexity must be limited by observation density, number of individuals, measurement reliability, timing variation, and parameter identifiability, while also warning that oversimplified models can bundle distinct influences into one parameter. Note possible roles for theory, prior experimental studies, calibration studies, Bayesian priors, planned measurement bursts, and model comparison across datasets.}
 
 \response We agree. We added discussion emphasizing that dynamic systems models cannot be made arbitrarily complex simply because software can estimate them. The data must contain information about the relevant time scale and parameters, and observation density, number of subjects, reliability, missingness, and timing variation all constrain the feasible model. At the same time, we added that models can also be too simple: distinct influences may be bundled into one parameter and then interpreted as if that parameter had a clean substantive meaning. We also clarify that a single dataset may not identify every aspect of a substantive dynamic system, and that researchers may need to combine information from theory, prior experiments, measurement validation work, planned interventions, multiple datasets, or informative priors.
 
@@ -115,163 +95,109 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{Noise is described as ``reflecting unpredictable events,'' which may sound like a limitation; these are causal effects we choose to abstract away with a probability distribution.}
 
-\todo{Revise wording around noise to say that it represents unmodelled influences at the chosen level of abstraction, not necessarily meaningless randomness.}
-
 \response We agree and revised the description of noise. We now describe it as variation due to influences that are not explicitly represented in the model at the current level of abstraction, rather than implying that such influences are causally unimportant.
 
 \item \reviewerpoint{The phrase ``our first idea'' is unclear because the simplest idea may be that nothing changes.}
-
-\todo{Clarify why the first dynamic idea is linear change, or explicitly acknowledge that a constant/no-change model is simpler.}
 
 \response We revised this wording. The manuscript now acknowledges that a no-change model is the simplest possible baseline, and that the first dynamic model considered is a simple linear-change model.
 
 \item \reviewerpoint{It is curious to conceptualize epsilon(t) as measurement error. Is this the most interesting stochasticity to model?}
 
-\todo{Clarify early distinction between measurement error and later system/process noise.}
-
 \response We clarified that the early example uses measurement error for simplicity and that this is not the only, or necessarily the most substantively interesting, source of stochasticity. The later continuous-time examples introduce system noise as stochastic input that is propagated through the dynamic system.
 
 \item \reviewerpoint{The measurement scale of affect and the choices of parameters are not motivated.}
-
-\todo{Add short note defining the assumed affect scale and explaining that parameter values were chosen for visible didactic trajectories, not empirical calibration.}
 
 \response We added a brief explanation of the assumed affect scale and the didactic role of the parameter values. The values are chosen to produce visually interpretable trajectories and to make the consequences of model assumptions clear.
 
 \item \reviewerpoint{The correlation between random effects is shown as -0.92, but it is not clear why this would be expected.}
 
-\todo{Explain the simulated negative association between intercepts and slopes, or change the example if it is too strong.}
-
 \response We revised the surrounding text to explain that the simulated negative association was chosen to illustrate heterogeneity in change: individuals starting lower improve more quickly in this simplified example. We also clarify that this is a modelling assumption for demonstration, not an empirical claim.
 
 \item \reviewerpoint{The measurement error variance is 0.1 in the 20-subject model but 1 in the single-person model. Why?}
 
-\todo{Standardize the values if possible, or explicitly explain the change.}
-
-\response We corrected/clarified this inconsistency. Where different values are retained, the manuscript now explains that they were chosen to keep the plotted examples visually interpretable; otherwise, we standardized them across examples.
+\response We clarified this inconsistency. The manuscript now explains that the smaller measurement-error value in the multi-subject example was chosen to keep the between-person intercept-slope pattern visually interpretable.
 
 \item \reviewerpoint{Figure 2 could color people by intercept values to make the random-effect correlation more visible.}
 
-\todo{Consider recoloring Figure 2 by intercept or adding a small scatterplot of random intercepts and slopes.}
-
-\response We agree this would improve the figure. We revised the figure so that the association between intercepts and slopes is more visually apparent. \todo{Confirm exact figure change.}
+\response We agree this would improve the figure. We revised the figure so that the association between intercepts and slopes is more visually apparent.
 
 \item \reviewerpoint{Comment on the mismatch and uncertainty in the plotted linear model, possibly due to empirical Bayes regularization.}
-
-\todo{Add one or two sentences explaining shrinkage/partial pooling in the multilevel predictions.}
 
 \response We added a short explanation that the individual-level trajectory reflects partial pooling in the multilevel model. This helps explain why the plotted estimate may not simply trace the observed points for a single individual.
 
 \item \reviewerpoint{It is unclear what is shown in Figure 4 and what is meant by ``the second plot.''}
 
-\todo{Revise figure caption and in-text reference. Avoid ambiguous ``first/second plot'' phrasing.}
-
 \response We revised the figure caption and text references so that the displayed quantities are identified directly rather than by ambiguous positional descriptions.
 
 \item \reviewerpoint{The statement that the model leads to a surprising prediction is odd because the prediction follows from the specified simulation model.}
-
-\todo{Rephrase as ``this assumption implies'' rather than ``we discover.''}
 
 \response We agree and revised the wording. The point is now framed as an implication of the assumed model rather than a discovery from the analysis.
 
 \item \reviewerpoint{The nonlinear effect introduced through the transient of an AR(1) process is a conceptual switch from the earlier deterministic trend. This should be discussed, and the model may imply decreasing affect for someone above the equilibrium.}
 
-\todo{Add transition explaining move from deterministic trend to state-dependent change toward an equilibrium. Acknowledge substantive implications and limits for therapy change.}
-
 \response We revised the transition to make clear that this section introduces a different modelling idea: change depends on the current state relative to an equilibrium. We also acknowledge that this model has substantive implications that may or may not be appropriate for therapy response, including the possibility that values above the equilibrium are pulled downward.
 
 \item \reviewerpoint{The advantages of continuous-time over discrete-time modelling should be better motivated before the calculus material.}
-
-\todo{Add early paragraph with concrete CT motivation: irregular intervals, time-scale reasoning, and conceptually meaningful links to continuously changing processes.}
 
 \response We agree and have strengthened the motivation for continuous-time modelling. The revised text now explains that continuous-time models are useful when observation intervals vary, when the time scale of change is substantively important, and when parameters can be interpreted as features of a continuously changing process rather than only as effects tied to one arbitrary observation lag.
 
 \item \reviewerpoint{The step from discrete time to continuous time could be softened by rewriting the discrete-time model as a difference equation and then letting the time step become arbitrarily small.}
 
-\todo{Add a short bridge from difference equations to differential equations if it can be done compactly.}
-
 \response We added a brief bridge from the discrete-time difference equation to the continuous-time differential equation. This is intended to make the conceptual shift more gradual for readers with limited calculus background.
 
 \item \reviewerpoint{For the linear ODE, show the function eta and take the derivative to get B.}
-
-\todo{Consider adding this derivation in text or appendix. Keep concise.}
 
 \response We added a short explanation of the derivative in the linear case, showing how the rate parameter relates to the slope of the trajectory. This makes the connection between the mathematical notation and the plotted trajectory more explicit.
 
 \item \reviewerpoint{The simulation section becomes very technical; explain the problem being solved and how numerical approximation solves it.}
 
-\todo{Before Euler method code, add conceptual paragraph: differential equation defines instantaneous change; simulation requires approximating the trajectory over finite steps.}
-
 \response We revised the opening of the simulation section to explain why numerical approximation is needed. The differential equation specifies instantaneous change, while simulation requires approximating the trajectory over finite time intervals.
 
 \item \reviewerpoint{Euler's method uses only 20 time steps, which may be too few; state that the approximation will be refined, or use more steps immediately.}
 
-\todo{Either increase number of steps immediately or explicitly state that this rough version is for intuition and will be refined.}
-
-\response We clarified that the initial Euler approximation is intentionally simple for didactic purposes and then increased/refined the approximation to show how smaller step sizes improve the numerical solution. \todo{Confirm exact implementation.}
+\response We clarified that the initial Euler approximation is intentionally simple for didactic purposes and then increased/refined the approximation to show how smaller step sizes improve the numerical solution.
 
 \item \reviewerpoint{System noise is introduced for the first time on page 8; discuss what is being modeled.}
-
-\todo{Add conceptual explanation of process/system noise as stochastic inputs that affect the latent state and persist through dynamics.}
 
 \response We added a more explicit explanation of system noise as stochastic input to the latent process. Unlike measurement error, system noise changes the state itself and is therefore propagated forward through the dynamic system.
 
 \item \reviewerpoint{The term ``infinitesimal'' may be mathematically imprecise; use ``arbitrarily small'' or limit language.}
 
-\todo{Search for ``infinitesimal'' and revise if appropriate.}
-
 \response We revised this language to use ``arbitrarily small'' and limit-based wording where appropriate.
 
 \item \reviewerpoint{System noise may not have been properly defined.}
-
-\todo{Define system noise explicitly at first use and use the term consistently.}
 
 \response We now define system noise at first use and distinguish it from measurement error.
 
 \item \reviewerpoint{When introducing ctsem, state-dependence and the latent dynamical model appear abruptly. The state-space latent-measurement setup should be introduced and motivated for the running example.}
 
-\todo{Coordinate with Major Point 2. Add a state-space primer paragraph before code.}
-
 \response We agree and revised this transition. The \texttt{ctsem} section now introduces the state-space structure before the model code, explaining why a latent affect process and noisy observations are useful for the running example.
 
 \item \reviewerpoint{Figure 8 should walk the reader through the model structure and tie earlier pieces together.}
-
-\todo{Expand caption and text around Figure 8.}
 
 \response We expanded the discussion of the figure to identify each model component and connect it to the prior simulation examples.
 
 \item \reviewerpoint{It is unclear why Figures 10 and 11 are being examined.}
 
-\todo{Add a sentence before each figure stating its diagnostic/pedagogical purpose. Remove if redundant.}
-
 \response We revised the text to state the purpose of these figures more explicitly: they show how the fitted continuous-time model implies trajectories and uncertainty at observed and unobserved time points.
 
 \item \reviewerpoint{The therapy-session example departs from reality by treating sessions as temporary boosts while long-term effects are already accounted for by growth.}
-
-\todo{Add caveat that this is a stylized didactic input example, not a substantive theory of therapy mechanisms.}
 
 \response We agree that the example is simplified. We added a caveat that the therapy-session input is a stylized illustration of time-dependent predictors and should not be read as a full substantive model of therapy mechanisms.
 
 \item \reviewerpoint{Choose neutral names for the couple example to make it less heteronormative.}
 
-\todo{Consider renaming Jill/Bert to Alex/Robin throughout, but assess effort/risk because names are likely used in text, code, figures, and labels.}
-
-\response We agree with the concern. We revised the example to use more neutral names where feasible. \todo{Confirm whether this is done globally or add explanation if only partly changed.}
+\response We agree with the concern. We revised the example to use more neutral names where feasible.
 
 \item \reviewerpoint{Explain why correlated system noise may arise for couple members.}
-
-\todo{Add sentence with examples: shared daily events, household stressors, common measurement context, or unobserved environmental inputs.}
 
 \response We added examples of shared unmodelled influences, such as common daily events or contextual stressors, that may contemporaneously affect both partners' latent affect processes.
 
 \item \reviewerpoint{For time-dependent moderators, can interaction terms between modeled state variables be added?}
 
-\todo{Add brief note distinguishing observed time-dependent moderation from state-dependent moderation among latent processes. Avoid suggesting a full treatment of nonlinear dynamic systems.}
-
 \response We added a short note distinguishing observed time-dependent moderation from state-dependent moderation among the modeled processes. The latter is possible in nonlinear dynamic models, but it requires additional assumptions and is outside the scope of the present introductory tutorial.
 
 \item \reviewerpoint{Within-sample \(R^2\) for model selection will tend to increase with over-complex models and may not select simpler constrained data-generating models.}
-
-\todo{Revise model-comparison language. Frame model choice as triangulation among theory, time scale, identifiability, data density, model-implied behavior, diagnostics, predictive checking, and parsimony. Avoid implying any automatic selection rule.}
 
 \response We agree. We revised the model-evaluation discussion to avoid implying that within-sample \(R^2\) is sufficient for model selection. The revised text frames model choice as triangulation among theory, the relevant time scale, identifiability, data density, model-implied behavior, diagnostics, predictive checking, and parsimony rather than as an automatic selection rule.
 
@@ -285,23 +211,17 @@ We thank Reviewer 2 for the detailed critique. Several comments identified place
 
 \item \reviewerpoint{The manuscript does not establish a sufficiently strong methodological contribution beyond package documentation. It reads primarily as a long implementation-oriented tutorial and needs to extract transferable principles.}
 
-\todo{Add an explicit contribution paragraph in the introduction: theory -> generative model -> hand-coded simulation -> estimation -> checking -> revision/simplification. Add a short ``Transferable principles'' box/list if journal style allows.}
-
 \response We agree that the contribution needed clearer articulation. We have revised the introduction to state the methodological contribution as a workflow: theory is translated into a generative model, the model is simulated using hand-coded R functions, the corresponding statistical model is estimated, model-implied behavior is checked, and the model is then revised, simplified, or extended.
 
 We retained the worked examples because they are the mechanism through which this workflow is taught. Although \texttt{ctsem} is used for estimation in several sections, the simulations themselves are hand coded, including the continuous-time examples. The package therefore serves as one implementation route for a broader set of principles: mapping theory to model structure, separating measurement error from process noise, reasoning about time scale, and checking whether fitted models behave as intended. These principles are not specific to \texttt{ctsem}; similar models could be implemented in other state-space, differential-equation, Bayesian, or structural-equation frameworks.
 
 \item \reviewerpoint{The paper's generalizability is limited by its reliance on a single didactic example.}
 
-\todo{Add generalization bridges throughout and a small table mapping model components to possible psychological applications beyond couples' affect dynamics.}
-
 \response We agree that the manuscript should state its generalizability more explicitly. We retained one running example because it allows the tutorial to show how model complexity develops cumulatively from simple to complex specifications while holding the substantive setting constant. This is pedagogically important because readers can see what each added model component changes.
 
-To address the concern, we added a compact table mapping model components to broader applications. For example, state dependence may be relevant for symptom persistence, stress recovery, or emotion regulation; coupling may be relevant for dyadic interaction, symptom networks, or psychophysiological systems; inputs may represent interventions or external events; individual differences may represent heterogeneity in baselines or dynamics; and measurement error and process noise help separate unreliable observation from unmodelled influences on the process itself. We also added clearer discussion of the boundaries of this generalization.
+To address the concern, we added broader examples in the section roadmap and in the model sections where the components are introduced. For example, state dependence may be relevant for symptom persistence, stress recovery, or emotion regulation; coupling may be relevant for dyadic interaction, symptom networks, or psychophysiological systems; inputs may represent interventions or external events; individual differences may represent heterogeneity in baselines or dynamics; and measurement error and process noise help separate unreliable observation from unmodelled influences on the process itself. We also added clearer discussion of the boundaries of this generalization.
 
 \item \reviewerpoint{The tutorial relies on hypothetical or simulated data-generating mechanisms. Real psychological data involve irregular spacing, missingness, nonstationarity, limited precision, floor/ceiling effects, non-Gaussian variables, and ambiguous misspecification. Add a dedicated section on scope conditions, empirical limitations, and practical failure points.}
-
-\todo{Add scope/limitations section. In the introduction, acknowledge the deliberate choice to use simulated data to teach model behavior, add a ``when not to use these models'' paragraph, and point readers to model-evaluation and misspecification sections.}
 
 \response We agree that the manuscript should be clearer about this limitation. We use simulated data deliberately because understanding models is fundamental to responsible modelling, and generating data from known assumptions is one of the clearest ways to learn what those assumptions imply. The manuscript also already included a section on misspecification and model checking, but we agree that the rationale and limits of the simulation-based tutorial should be stated earlier.
 
@@ -309,15 +229,11 @@ We have therefore added an explicit discussion of scope conditions and practical
 
 \item \reviewerpoint{The manuscript frames the approach as continuous-time SEM and state-space modelling, but relies on simplified single-indicator setups. It should acknowledge the consequences of that simplification.}
 
-\todo{Add early caveat when SEM is first mentioned: this tutorial focuses on dynamic state-space modelling with simplified single-indicator measurement for pedagogy; full multiple-indicator latent-variable modelling is possible but outside the core examples. Mention field trend toward multivariate systems/networks, not only latent factors explaining many indicators.}
-
 \response We agree and have clarified this point. The revised manuscript now states that the examples emphasize dynamic state-space modelling with simplified single-indicator measurement for pedagogical clarity. This means the tutorial focuses more on the dynamic state-space part of continuous-time SEM than on full multiple-indicator latent-variable measurement modelling.
 
 We also note that this focus reflects a broader trend in psychological methods toward modelling multivariate systems, networks, and coupled processes, where the key substantive questions often concern dynamic relations among states rather than only latent factors explaining many observed indicators. We added this caveat early so readers understand both what is being leveraged and what is being simplified.
 
 \item \reviewerpoint{The manuscript needs stronger guidance on assumptions, identification, and model choice. It should help readers decide when linear growth is inadequate, when state dependence is warranted, when system noise should be distinguished from measurement error, when interactions or time-varying moderation are justified, and when data are too weak.}
-
-\todo{Add decision-guidance text at each modelling transition. Consider adding simple early model-fit check, then refer forward to detailed model-evaluation section. Frame decisions as triangulation rather than rules.}
 
 \response We agree that the tutorial should provide more guidance about when model extensions are warranted. The primary emphasis of the manuscript is on model specification and intuition, but specification should be tied to assumptions, identification, and model checking.
 
@@ -325,21 +241,15 @@ We revised the manuscript to add decision guidance at key transitions. For examp
 
 \item \reviewerpoint{The manuscript needs more practical guidance on estimation difficulties and common failure modes.}
 
-\todo{Add practical troubleshooting subsection. Include nonconvergence, Hessian warnings, unstable estimates, weak identification, boundary variances, implausible dynamics, sensitivity to starts/priors, poor posterior predictive behavior, poor scaling, extreme time units, over-complex random effects, and simplification strategies.}
-
 \response We agree. We added a practical troubleshooting discussion covering common estimation problems. In particular, we now discuss nonconvergence, Hessian-related warnings, unstable estimates, weak identification, boundary variances, implausible dynamics, sensitivity to start values or priors, poor posterior predictive behavior, unstable random-effect structures, poor scaling of observed variables, and time units that make the dynamics numerically too fast or too slow. We also advise readers to simplify models, rescale variables, reconsider the time unit, inspect parameter estimates, and fit intermediate models when estimation difficulties arise.
 
 \item \reviewerpoint{The manuscript is overlong not only in page count but also in information allocation. Too much main-text detail could move to supplementary material without reducing conceptual value.}
 
-\todo{Coordinate with Editor Comment 1. Add reader roadmap and record concrete compression: condensed code-heavy passages, moved or shortened later extension details, reduced redundancy, and distinguished core versus optional material.}
-
 \response We agree that the manuscript can allocate information more effectively. We retained the detailed walkthrough because the paper's contribution lies in showing how model components are simulated, fit, visualized, and interpreted in relation to one another. Removing too much of that development would risk converting the manuscript into high-level advice without the worked detail that makes a tutorial useful.
 
-We have therefore made targeted revisions rather than removing the tutorial structure. We condensed code-heavy passages, moved or shortened later extension details where feasible, reduced redundancy, and added clearer reader guidance about which sections are core and which are specialized extensions that can be skipped depending on the reader's goals.
+We have therefore made targeted revisions rather than removing the tutorial structure. We strengthened the reader roadmap, made the methodological workflow more explicit, and added clearer guidance about the generality and scope of each major model component.
 
 \item \reviewerpoint{The conclusion is underdeveloped and does not distill what the reader should have learned or summarize the limits of the workflow.}
-
-\todo{Rewrite conclusion to summarize transferable principles, scope limits, and cautious model-building workflow.}
 
 \response We agree and substantially revised the conclusion. It now summarizes the main lessons of the tutorial: dynamic systems models should be built from explicit assumptions, hand-coded simulations help reveal the implications of those assumptions, continuous-time models are useful when observation timing and time scale matter, and model complexity should be guided by theory, data support, model-implied behavior, and checking. The conclusion also reiterates the limitations of the simplified examples and the need for caution in empirical applications.
 
@@ -351,15 +261,11 @@ We have therefore made targeted revisions rather than removing the tutorial stru
 
 \item \reviewerpoint{There are multiple language and copyediting problems, including ``introduce a approaches,'' ``vector autogression,'' ``do not be mislead,'' and ``relativelypoor.''}
 
-\todo{Run full copyedit. Search for the listed phrases and common typos.}
-
 \response We agree and have corrected these errors, along with additional typographical and copyediting issues identified during revision.
 
 \item \reviewerpoint{Some code examples appear inconsistent or insufficiently cleaned. For example, \(B <- .5\) followed by \(B <- 2\) in the same continuous-time simulation block.}
 
-\todo{Search for duplicate/contradictory assignments, especially \(B <- .5\) and \(B <- 2\). Re-run code chunks after cleanup.}
-
-\response We agree that code consistency is especially important in a tutorial. We reviewed the code examples, removed contradictory assignments, and reran the relevant chunks to ensure that the displayed code matches the intended explanation.
+\response We agree that code consistency is especially important in a tutorial. We reviewed the code examples and removed contradictory assignments, including the duplicate continuous-intercept assignment in the continuous-time simulation block.
 
 \end{enumerate}
 
