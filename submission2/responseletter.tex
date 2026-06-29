@@ -24,11 +24,11 @@ Manuscript MET-2026-0505\\
 
 Dear Editor,
 
-Thank you for the opportunity to submit a revised version of our manuscript to \textit{Psychological Methods}. We appreciate the high-risk revision decision and the reviewers' detailed comments. We have organized the revision around the three issues emphasized in the editorial decision: focus and length, scope and boundary conditions, and generalizability beyond the running example.
+Thank you for the opportunity to submit a revised version of our manuscript to \textit{Psychological Methods}. We appreciate the revision decision and the reviewers' detailed comments. We have organized the revision around the issues emphasized in the editorial decision: focus and length, scope and boundary conditions, and generalizability beyond the running example.
 
-The revised manuscript now states the methodological contribution more explicitly as a workflow: theory is translated into a generative model, the model is simulated using hand-coded R functions, the corresponding statistical model is estimated, model-implied behavior is checked against the intended theory and observed data, and the specification is then revised, simplified, or extended. This workflow is not specific to \texttt{ctsem}, although \texttt{ctsem} provides a useful implementation for several of the continuous-time state-space models considered.
+The revised manuscript now states the methodological contribution more explicitly as elements of a workflow: theory is translated into a generative model, the model is simulated using understandable R functions, the corresponding statistical model is estimated, model-implied behavior is checked against the intended theory and observed data, and the specification is then revised, simplified, or extended. This workflow is not specific to \texttt{ctsem}, although \texttt{ctsem} provides a useful implementation for several of the continuous-time state-space models considered.
 
-We have therefore revised the manuscript by making the conceptual workflow, scope conditions, and generalizability more explicit rather than simply adding caveats. We added a dedicated scope and boundary section, strengthened the introduction and conclusion, clarified the transition from hand-coded simulation to state-space estimation, added section-by-section examples of broader psychological applications, and expanded practical model-checking and troubleshooting guidance.
+We have therefore revised the manuscript by making the conceptual workflow, scope conditions, and generalizability more explicit rather than simply adding caveats. We added a dedicated scope and boundary section, strengthened the introduction and conclusion, clarified the transition from simulation to state-space estimation, added section-by-section examples of broader psychological applications, and expanded practical model-checking and troubleshooting guidance.
 
 \section*{Editor}
 
@@ -69,7 +69,7 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{Explain the general rationale more at the outset. It is not obvious why the tutorial creates generative models based on theory and then recovers these models from synthetic data, rather than simply fitting successively more complex models.}
 
-\response We agree. The revised introduction now explains why the tutorial begins from generative models. Simulation is not merely a convenience for producing example data; it is a way to make theoretical assumptions operational and inspect their implications before fitting models to empirical observations. All simulations in the tutorial are hand coded, including the continuous-time and dynamic-systems examples, so that readers can see how assumptions translate into trajectories before seeing the corresponding estimation model. We now state this rationale explicitly before the first examples.
+\response We agree. The revised introduction now explains why the tutorial begins from generative models. Simulation is not merely a convenience for producing example data; it is a way to make theoretical assumptions operational and inspect their implications before fitting models to empirical observations. All simulations in the tutorial are coded using basic R functions, including the continuous-time and dynamic-systems examples, so that readers can relate code to the models and see how assumptions translate into trajectories before seeing the corresponding estimation model. We now state this rationale explicitly before the first examples.
 
 \item \reviewerpoint{There is a jump in difficulty when introducing ctsem. New ideas, including the latent dynamic model, are introduced too quickly, and Figure 18 is not explained in enough detail.}
 
@@ -77,15 +77,15 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{The paper is long and contains 32 figures. It may be difficult to read in one sitting; later model details could be moved to an appendix.}
 
-\response We agree that the manuscript should be easier to navigate. In the current revision we sharpened the main narrative, strengthened the opening roadmap, and clarified the role of each model component in the tutorial sequence. Because this is a tutorial, we retained figures that are essential for understanding model-implied behavior. We will also consider a further compaction pass, particularly for code-heavy or extension-specific material, if the editor views that as necessary after these revisions.
+\response We agree that the manuscript should be easier to navigate. In the current revision we sharpened the main narrative, strengthened the opening roadmap, and clarified the role of each model component in the tutorial sequence, suggesting which models may be most appropriate for different research questions or reader comprehension. Because this is a tutorial, we retained figures that are essential for understanding model-implied behavior. We will also consider a further compaction pass, particularly for code-heavy or extension-specific material, if the editor views that as necessary after these revisions -- we hope however that the tutorial may proceed as is, supporting both more novice and more advanced readers without forcing one to go back and forth between the main text and supplementary material.
 
 \item \reviewerpoint{Comment more on possible nonlinear models and model behavior. Can latent processes interact? The running example uses single fixed-point systems, and estimating initial states does not explain how a person arrived at the initial state.}
 
-\response We agree and have added a brief discussion of nonlinear extensions that are most closely connected to the tutorial. We now note that state-dependent moderation effects could allow the influence of one process on another to depend on the current level of the processes, and that nonlinear measurement models can represent cases where the observed scale changes sensitivity across the latent range, for example producing skewed or bounded observed outcomes from a continuously changing latent process. We also clarify that estimated initial states characterize the beginning of the observed time window; they should not be interpreted as a complete model of how the person or system arrived at that state before observation began.
+\response We agree and have added a brief discussion of nonlinear extensions that are most closely connected to the tutorial. We now note that state-dependent moderation effects could allow the influence of one process on another to depend on the current level of the processes, and that nonlinear measurement models can represent cases where the observed scale changes sensitivity across the latent range, for example producing skewed observed outcomes from a continuously changing latent Gaussian process. We also clarify that estimated initial states characterize the beginning of the observed time window; they should not be interpreted as a complete model of how the person or system arrived at that state before observation began.
 
 \item \reviewerpoint{Comment on data requirements of ctsem and on the broader question of whether a whole dynamic system can always be fit to a single dataset. Discuss alternative ways to combine sources of information.}
 
-\response We agree. We added discussion emphasizing that dynamic systems models cannot be made arbitrarily complex simply because software can estimate them. The data must contain information about the relevant time scale and parameters, and observation density, number of subjects, reliability, missingness, and timing variation all constrain the feasible model. At the same time, we added that models can also be too simple: distinct influences may be bundled into one parameter and then interpreted as if that parameter had a clean substantive meaning. We also clarify that a single dataset may not identify every aspect of a substantive dynamic system, and that researchers may need to combine information from theory, prior experiments, measurement validation work, planned interventions, multiple datasets, or informative priors.
+\response We added discussion emphasizing that dynamic systems models cannot be made arbitrarily complex simply because software can estimate them. The data must contain information about the relevant time scale and parameters, and observation density, number of subjects, reliability, missingness, and timing variation all constrain the feasible model. At the same time, we added that models can also be too simple: distinct influences may be bundled into one parameter and then interpreted as if that parameter had a clean substantive meaning. We also mention that the simulation approach can help researchers determine approximate requirements in terms of data density, timing, and reliability, under specific assumptions (however, this is not a tutorial on power analysis or sample size determination). Combining different sources of information for systems estimation is a fascinating topic, but we believe it is beyond the scope of this tutorial. %We also clarify that a single dataset may not identify every aspect of a substantive dynamic system, and that researchers may need to combine information from theory, prior experiments, measurement validation work, planned interventions, multiple datasets, or informative priors.
 
 \end{enumerate}
 
@@ -95,7 +95,7 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{Noise is described as ``reflecting unpredictable events,'' which may sound like a limitation; these are causal effects we choose to abstract away with a probability distribution.}
 
-\response We agree and revised the description of noise. We now describe it as variation due to influences that are not explicitly represented in the model at the current level of abstraction, rather than implying that such influences are causally unimportant.
+\response We agree and revised the description of noise. We now describe it as variation due to influences that are not explicitly represented in the model.
 
 \item \reviewerpoint{The phrase ``our first idea'' is unclear because the simplest idea may be that nothing changes.}
 
@@ -103,7 +103,7 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{It is curious to conceptualize epsilon(t) as measurement error. Is this the most interesting stochasticity to model?}
 
-\response We clarified that the early example uses measurement error for simplicity and that this is not the only, or necessarily the most substantively interesting, source of stochasticity. The later continuous-time examples introduce system noise as stochastic input that is propagated through the dynamic system.
+\response We clarified that this is not the only, or necessarily the most substantively interesting, source of stochasticity. The later continuous-time examples introduce system noise as stochastic input that is propagated through the dynamic system.
 
 \item \reviewerpoint{The measurement scale of affect and the choices of parameters are not motivated.}
 
@@ -111,7 +111,7 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{The correlation between random effects is shown as -0.92, but it is not clear why this would be expected.}
 
-\response We revised the surrounding text to explain that the simulated negative association was chosen to illustrate heterogeneity in change: individuals starting lower improve more quickly in this simplified example. We also clarify that this is a modelling assumption for demonstration, not an empirical claim.
+\response We revised that section to make the calculation of the correlation more explicit.
 
 \item \reviewerpoint{The measurement error variance is 0.1 in the 20-subject model but 1 in the single-person model. Why?}
 
@@ -119,7 +119,7 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{Figure 2 could color people by intercept values to make the random-effect correlation more visible.}
 
-\response We agree this would improve the figure. We revised the figure so that the association between intercepts and slopes is more visually apparent.
+\response We agree and implemented this suggestion.
 
 \item \reviewerpoint{Comment on the mismatch and uncertainty in the plotted linear model, possibly due to empirical Bayes regularization.}
 
@@ -135,11 +135,11 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{The nonlinear effect introduced through the transient of an AR(1) process is a conceptual switch from the earlier deterministic trend. This should be discussed, and the model may imply decreasing affect for someone above the equilibrium.}
 
-\response We revised the transition to make clear that this section introduces a different modelling idea: change depends on the current state relative to an equilibrium. We also acknowledge that this model has substantive implications that may or may not be appropriate for therapy response, including the possibility that values above the equilibrium are pulled downward.
+\response We revised the transition to make clear that this section introduces a different modelling idea: change depends on the current state relative to an equilibrium. We also acknowledge the point regarding downwards movement towards the equilibrium in the text. 
 
 \item \reviewerpoint{The advantages of continuous-time over discrete-time modelling should be better motivated before the calculus material.}
 
-\response We agree and have strengthened the motivation for continuous-time modelling. The revised text now explains that continuous-time models are useful when observation intervals vary, when the time scale of change is substantively important, and when parameters can be interpreted as features of a continuously changing process rather than only as effects tied to one arbitrary observation lag.
+\response We agree and have strengthened the motivation for continuous-time modelling. The revised text now explains that continuous-time models are useful when observation intervals vary, when the time scale of change is substantively important, and because parameters can be interpreted as features of a continuously changing process rather than only as effects tied to one arbitrary observation lag.
 
 \item \reviewerpoint{The step from discrete time to continuous time could be softened by rewriting the discrete-time model as a difference equation and then letting the time step become arbitrarily small.}
 
@@ -147,7 +147,7 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{For the linear ODE, show the function eta and take the derivative to get B.}
 
-\response We added a short explanation of the derivative in the linear case, showing how the rate parameter relates to the slope of the trajectory. This makes the connection between the mathematical notation and the plotted trajectory more explicit.
+\response We added a short explanation of the derivative in the linear case, showing how the rate parameter relates to the slope of the trajectory. 
 
 \item \reviewerpoint{The simulation section becomes very technical; explain the problem being solved and how numerical approximation solves it.}
 
@@ -179,15 +179,15 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{It is unclear why Figures 10 and 11 are being examined.}
 
-\response We revised the text to state the purpose of these figures more explicitly: they show how the fitted continuous-time model implies trajectories and uncertainty at observed and unobserved time points.
+\response We revised the text to state the purpose of these figures more explicitly: they show how the fitted continuous-time model implies trajectories and uncertainty at observed and unobserved time points, help to provide intuition for how the model works, and also provide useful checks on the model, in case predictions diverge substantially.
 
 \item \reviewerpoint{The therapy-session example departs from reality by treating sessions as temporary boosts while long-term effects are already accounted for by growth.}
 
-\response We agree that the example is simplified. We added a caveat that the therapy-session input is a stylized illustration of time-dependent predictors and should not be read as a full substantive model of therapy mechanisms.
+\response We added a caveat that the therapy-session input is a stylized illustration of time-dependent predictors and should not be read as a full substantive model of therapy mechanisms.
 
 \item \reviewerpoint{Choose neutral names for the couple example to make it less heteronormative.}
 
-\response We agree with the concern. We revised the example to use more neutral names where feasible.
+\response We revised the example to use more neutral names where feasible.
 
 \item \reviewerpoint{Explain why correlated system noise may arise for couple members.}
 
@@ -195,7 +195,7 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \item \reviewerpoint{For time-dependent moderators, can interaction terms between modeled state variables be added?}
 
-\response We added a short note distinguishing observed time-dependent moderation from state-dependent moderation among the modeled processes. The latter is possible in nonlinear dynamic models, but it requires additional assumptions and is outside the scope of the present introductory tutorial.
+\response We added a short note distinguishing observed time-dependent moderation from state-dependent moderation among the modeled processes, noting that the latter is also possible using similar syntax. 
 
 \item \reviewerpoint{Within-sample \(R^2\) for model selection will tend to increase with over-complex models and may not select simpler constrained data-generating models.}
 
@@ -205,13 +205,13 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \section*{Reviewer 2}
 
-We thank Reviewer 2 for the detailed critique. Several comments identified places where the manuscript needed clearer statements of contribution, generalizability, assumptions, and practical limitations. We agree that these aspects were not sufficiently explicit in the original version. We retained the worked tutorial structure, however, because it is central to the manuscript's purpose: \textit{Psychological Methods} publishes tutorials, and the paper is intended to teach a model-building workflow rather than provide a terse software reference.
+We thank Reviewer 2 for the detailed critique. Several comments identified places where the manuscript needed clearer statements of contribution, generalizability, assumptions, and practical limitations. We agree that these aspects were not sufficiently explicit in the original version. We retained the worked tutorial structure, however, because it is central to the manuscript's purpose: \textit{Psychological Methods} publishes tutorials, and the paper is intended to teach the details of a model-building workflow rather than provide a terse software reference or high level advice.
 
 \begin{enumerate}[label=\textbf{Reviewer 2, Main Concern \arabic*.}]
 
 \item \reviewerpoint{The manuscript does not establish a sufficiently strong methodological contribution beyond package documentation. It reads primarily as a long implementation-oriented tutorial and needs to extract transferable principles.}
 
-\response We agree that the contribution needed clearer articulation. We have revised the introduction to state the methodological contribution as a workflow: theory is translated into a generative model, the model is simulated using hand-coded R functions, the corresponding statistical model is estimated, model-implied behavior is checked, and the model is then revised, simplified, or extended.
+\response We have revised the introduction to state the methodological contribution as a workflow: theory is translated into a generative model, the model is simulated using understandable R functions, the corresponding statistical model is estimated, model-implied behavior is checked against the intended theory and observed data, and the specification is then revised, simplified, or extended.
 
 We retained the worked examples because they are the mechanism through which this workflow is taught. Although \texttt{ctsem} is used for estimation in several sections, the simulations themselves are hand coded, including the continuous-time examples. The package therefore serves as one implementation route for a broader set of principles: mapping theory to model structure, separating measurement error from process noise, reasoning about time scale, and checking whether fitted models behave as intended. These principles are not specific to \texttt{ctsem}; similar models could be implemented in other state-space, differential-equation, Bayesian, or structural-equation frameworks.
 
