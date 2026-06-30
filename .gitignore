@@ -2,3 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+ctsemTutorial_cache
+ctsemTutorial_files
+trainingMaterial
+textemp
+.quarto
