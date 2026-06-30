@@ -205,19 +205,19 @@ We thank Reviewer 1 for the careful and constructive review. We found the commen
 
 \section*{Reviewer 2}
 
-We thank Reviewer 2 for the detailed critique. Several comments identified places where the manuscript needed clearer statements of contribution, generalizability, assumptions, and practical limitations. We agree that these aspects were not sufficiently explicit in the original version. We retained the worked tutorial structure, however, because it is central to the manuscript's purpose: \textit{Psychological Methods} publishes tutorials, and the paper is intended to teach the details of a model-building workflow rather than provide a terse software reference or high level advice.
+We thank Reviewer 2 for the detailed critique. Several comments identified places where the manuscript needed clearer statements of contribution, generalizability, assumptions, and practical limitations. We agree that these aspects were not sufficiently explicit in the original version. We retained the worked tutorial structure, however, because it is central to the manuscript's purpose: \textit{Psychological Methods} publishes tutorials, and the paper is intended to build intuition and understanding for dynamic systems modelling by working through detailed examples. We appreciate that not every article has the exact balance of content every individual will need or desire, but hope that the purpose comes through clearer now. 
 
 \begin{enumerate}[label=\textbf{Reviewer 2, Main Concern \arabic*.}]
 
 \item \reviewerpoint{The manuscript does not establish a sufficiently strong methodological contribution beyond package documentation. It reads primarily as a long implementation-oriented tutorial and needs to extract transferable principles.}
 
-\response We have revised the introduction to state the methodological contribution as a workflow: theory is translated into a generative model, the model is simulated using understandable R functions, the corresponding statistical model is estimated, model-implied behavior is checked against the intended theory and observed data, and the specification is then revised, simplified, or extended.
+\response We mostly disagree with this comment, but hope it is nonetheless mitigated by the revised manuscript. The paper indeed involves a range of necessary package specifics, but these specifics are necessary to actually be able to build and apply the models, and an understanding of the models is necessary before one can apply, evaluate, and improve them. We have revised the introduction to state the methodological contribution as the components of a workflow: theory is translated into a generative model, the model is simulated using understandable R functions, the corresponding statistical model is estimated, model-implied behavior is checked against the intended theory and observed data, and the specification is then revised, simplified, or extended.
 
-We retained the worked examples because they are the mechanism through which this workflow is taught. Although \texttt{ctsem} is used for estimation in several sections, the simulations themselves are hand coded, including the continuous-time examples. The package therefore serves as one implementation route for a broader set of principles: mapping theory to model structure, separating measurement error from process noise, reasoning about time scale, and checking whether fitted models behave as intended. These principles are not specific to \texttt{ctsem}; similar models could be implemented in other state-space, differential-equation, Bayesian, or structural-equation frameworks.
+We retained the worked examples because they are the mechanism through which this workflow is taught. Although \texttt{ctsem} is used for estimation in several sections, the simulations themselves are coded with basic R functions, including the continuous-time examples. The package therefore serves as one implementation route for a broader set of principles: mapping theory to model structure, separating measurement error from process noise, reasoning about time scale, and checking whether fitted models behave as intended. These principles are not specific to \texttt{ctsem}; the same models and reasoning could be implemented without ctsem.
 
 \item \reviewerpoint{The paper's generalizability is limited by its reliance on a single didactic example.}
 
-\response We agree that the manuscript should state its generalizability more explicitly. We retained one running example because it allows the tutorial to show how model complexity develops cumulatively from simple to complex specifications while holding the substantive setting constant. This is pedagogically important because readers can see what each added model component changes.
+\response We agree that the manuscript should state its generalizability more explicitly. We retained the running example because it allows the tutorial to show how model complexity develops cumulatively from simple to complex specifications while holding the substantive setting constant. This is pedagogically important because readers can see what each added model component changes.
 
 To address the concern, we added broader examples in the section roadmap and in the model sections where the components are introduced. For example, state dependence may be relevant for symptom persistence, stress recovery, or emotion regulation; coupling may be relevant for dyadic interaction, symptom networks, or psychophysiological systems; inputs may represent interventions or external events; individual differences may represent heterogeneity in baselines or dynamics; and measurement error and process noise help separate unreliable observation from unmodelled influences on the process itself. We also added clearer discussion of the boundaries of this generalization.
 
@@ -225,13 +225,13 @@ To address the concern, we added broader examples in the section roadmap and in 
 
 \response We agree that the manuscript should be clearer about this limitation. We use simulated data deliberately because understanding models is fundamental to responsible modelling, and generating data from known assumptions is one of the clearest ways to learn what those assumptions imply. The manuscript also already included a section on misspecification and model checking, but we agree that the rationale and limits of the simulation-based tutorial should be stated earlier.
 
-We have therefore added an explicit discussion of scope conditions and practical failure points. The revised manuscript now notes that real data may include irregular spacing, missingness, nonstationarity, limited reliability, floor or ceiling effects, non-Gaussian outcomes, weak identification, and ambiguous misspecification. We also added a short ``when not to use these models'' paragraph and clarify that researchers should often begin with simpler models when the data or theory do not support more complex dynamic specifications. Conversely, we note that excessive simplicity can also be misleading when distinct influences are bundled into one parameter and interpreted as if they reflected a single process.
+We have therefore added an explicit discussion of scope conditions and practical failure points. The revised manuscript now notes that real data likely involve varieties of complexity that are not fully captured by the simplified examples. We also added a short ``when not to use these models'' paragraph and clarify that researchers should often begin with simpler models when the data or theory do not support more complex dynamic specifications. Conversely, we note that excessive simplicity can also be misleading when distinct influences are bundled into one parameter and interpreted as if they reflected a single process.
 
 \item \reviewerpoint{The manuscript frames the approach as continuous-time SEM and state-space modelling, but relies on simplified single-indicator setups. It should acknowledge the consequences of that simplification.}
 
 \response We agree and have clarified this point. The revised manuscript now states that the examples emphasize dynamic state-space modelling with simplified single-indicator measurement for pedagogical clarity. This means the tutorial focuses more on the dynamic state-space part of continuous-time SEM than on full multiple-indicator latent-variable measurement modelling.
 
-We also note that this focus reflects a broader trend in psychological methods toward modelling multivariate systems, networks, and coupled processes, where the key substantive questions often concern dynamic relations among states rather than only latent factors explaining many observed indicators. We added this caveat early so readers understand both what is being leveraged and what is being simplified.
+We also note that this focus reflects a broader trend in psychological methods toward modelling multivariate systems, networks, and coupled processes, where the key substantive questions often concern dynamic relations among states rather than only latent factors explaining many observed indicators. We added this caveat early so readers understand both the purpose and the limitations of the simplified examples.
 
 \item \reviewerpoint{The manuscript needs stronger guidance on assumptions, identification, and model choice. It should help readers decide when linear growth is inadequate, when state dependence is warranted, when system noise should be distinguished from measurement error, when interactions or time-varying moderation are justified, and when data are too weak.}
 
@@ -241,17 +241,17 @@ We revised the manuscript to add decision guidance at key transitions. For examp
 
 \item \reviewerpoint{The manuscript needs more practical guidance on estimation difficulties and common failure modes.}
 
-\response We agree. We added a practical troubleshooting discussion covering common estimation problems. In particular, we now discuss nonconvergence, Hessian-related warnings, unstable estimates, weak identification, boundary variances, implausible dynamics, sensitivity to start values or priors, poor posterior predictive behavior, unstable random-effect structures, poor scaling of observed variables, and time units that make the dynamics numerically too fast or too slow. We also advise readers to simplify models, rescale variables, reconsider the time unit, inspect parameter estimates, and fit intermediate models when estimation difficulties arise.
+\response We agree. We added a practical troubleshooting discussion covering common estimation problems. In particular, we now discuss convergence and Hessian-related warnings, unstable estimates, weak identification, boundary variances, implausible dynamics, sensitivity to start values or priors, poor posterior predictive behavior, unstable random-effect structures, poor scaling of observed variables, and time units that make the dynamics numerically too fast or too slow. We also advise readers to simplify models, rescale variables, reconsider the time unit, inspect parameter estimates, and fit intermediate models when estimation difficulties arise.
 
 \item \reviewerpoint{The manuscript is overlong not only in page count but also in information allocation. Too much main-text detail could move to supplementary material without reducing conceptual value.}
 
-\response We agree that the manuscript can allocate information more effectively. We retained the detailed walkthrough because the paper's contribution lies in showing how model components are simulated, fit, visualized, and interpreted in relation to one another. Removing too much of that development would risk converting the manuscript into high-level advice without the worked detail that makes a tutorial useful.
+\response We cautiously acknowledge this concern, while emphasising that the article is intended as a tutorial that walks through the details of a model-building workflow -- we are not aiming only for conceptual value but very practical support. The paper's contribution lies in showing how model components are simulated, fit, visualized, and interpreted in relation to one another. Removing too much of that development would risk converting the manuscript into high-level advice without the worked detail that makes a tutorial useful.
 
-We have therefore made targeted revisions rather than removing the tutorial structure. We strengthened the reader roadmap, made the methodological workflow more explicit, and added clearer guidance about the generality and scope of each major model component.
+We have therefore made targeted revisions rather than removing the core tutorial details. We strengthened the reader roadmap to support both more novice and more advanced readers in selecting the appropriate sections to focus on, made the methodological workflow more explicit, and added clearer guidance about the generality and scope of each major model component. 
 
 \item \reviewerpoint{The conclusion is underdeveloped and does not distill what the reader should have learned or summarize the limits of the workflow.}
 
-\response We agree and substantially revised the conclusion. It now summarizes the main lessons of the tutorial: dynamic systems models should be built from explicit assumptions, hand-coded simulations help reveal the implications of those assumptions, continuous-time models are useful when observation timing and time scale matter, and model complexity should be guided by theory, data support, model-implied behavior, and checking. The conclusion also reiterates the limitations of the simplified examples and the need for caution in empirical applications.
+\response We agree and substantially revised the conclusion. It now summarizes the main lessons of the tutorial: dynamic systems models should be built from explicit assumptions, simulations help reveal the implications of those assumptions, continuous-time models are useful when observation timing matters and linking theory and model parameters is important, and model complexity should be guided by theory, data support, model-implied behavior, and checking. The conclusion also reiterates the limitations of the simplified examples and the need for caution in empirical applications.
 
 \end{enumerate}
 
@@ -261,11 +261,11 @@ We have therefore made targeted revisions rather than removing the tutorial stru
 
 \item \reviewerpoint{There are multiple language and copyediting problems, including ``introduce a approaches,'' ``vector autogression,'' ``do not be mislead,'' and ``relativelypoor.''}
 
-\response We agree and have corrected these errors, along with additional typographical and copyediting issues identified during revision.
+\response We have corrected these errors, along with additional typographical and copyediting issues identified during revision.
 
 \item \reviewerpoint{Some code examples appear inconsistent or insufficiently cleaned. For example, \(B <- .5\) followed by \(B <- 2\) in the same continuous-time simulation block.}
 
-\response We agree that code consistency is especially important in a tutorial. We reviewed the code examples and removed contradictory assignments, including the duplicate continuous-intercept assignment in the continuous-time simulation block.
+\response We reviewed the code examples and removed contradictory assignments, including the duplicate continuous-intercept assignment in the continuous-time simulation block.
 
 \end{enumerate}
 
@@ -275,6 +275,6 @@ We again thank the editor and reviewers for their careful feedback. The revised 
 
 Sincerely,
 
-Charles C. Driver and Michael Aristodemou
+Charles Driver \& Michael Aristodemou
 
 \end{document}
