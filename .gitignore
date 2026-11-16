@@ -2,8 +2,32 @@
 .Rhistory
 .RData
 .Ruserdata
+.quarto
 ctsemTutorial_cache
 ctsemTutorial_files
+supplement_cache
+supplement_files
 trainingMaterial
 textemp
-.quarto
+ctsemTutorial.tex
+supplement.tex
+*_text_only.qmd
+summary.html
+summary_files/
+
+# origin is a public repository: reviewer reports, the editor's letters and
+# our letters to the journal (which quote the reviews) are kept out of git
+submission*/Review*
+submission*/review*
+submission*/reviews*/
+submission*/responseletter*
+submission*/*_token_diff.html
+coverletter.*
+submission*/coverletter.*
+
+# quarto template examples
+apa/
+
+# logs and plots from the checks carry local paths; the scripts are tracked
+submission3/checks/*.log
+submission3/checks/*.pdf

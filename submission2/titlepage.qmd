@@ -1,0 +1,162 @@
+---
+title: "A Tutorial in Dynamic Systems Simulation and Modelling With R, ctsem, and lme4: Couples' Affect Dynamics Over Time"
+shorttitle: "Dynamic Systems Simulation and Modelling in R"
+
+author:
+  - name: Charles C. Driver
+    corresponding: true
+    orcid: 0000-0002-4174-2970
+    email: charles.driver@psychologie.uzh.ch
+    roles:
+      - conceptualization
+      - methodology
+      - software
+      - validation
+      - writing
+      - visualization
+    affiliations:
+      - id: uzh
+        name: University of Zurich
+        department: Department of Psychology
+        address: Binzmühlestrasse 14, Box 28
+        city: Zurich
+        region: Zurich
+        country: Switzerland
+        postal-code: 8057
+
+  - name: Michael Aristodemou
+    orcid: 0000-0003-0420-2702
+    roles:
+      - formal analysis
+      - writing
+      - visualization
+    affiliations:
+      - ref: uzh
+
+# --- front-matter extras ------------------------------------------------------
+
+blank-lines-above-author-note: 2
+author-note: 
+  disclosures:
+    related-report: "An earlier version of this manuscript is available as a PsyArXiv preprint at https://osf.io/preprints/psyarxiv/4q9ex_v3. The accompanying OSF project, including manuscript materials and code, is available at https://osf.io/xh6ue/. The examples use simulated data generated for the tutorial."
+    conflict-of-interest: The authors declare that they have no conflicts of interest to disclose.
+
+abstract: |-
+  Understanding how people change is a fundamental goal of psychological science. However, translating complex ideas about psychological dynamics into formal models can be challenging without tools that make the modelling assumptions explicit. In this tutorial, we demonstrate components of an iterative workflow for dynamic systems modelling in R: theory is translated into a generative model, the model is simulated with understandable functions, a corresponding statistical model is estimated, model-implied behavior is checked, and the specification is revised, simplified, or extended. We begin with familiar linear models in lme4 and then transition to ctsem, which allows us to estimate models with state-dependent change, random fluctuation distinct from measurement error, covariate effects, interactions, external inputs, and time-varying parameters. These continuous-time modelling concepts are illustrated using a running example of affect dynamics in couples therapy, but the same principles apply to other psychological domains, and many of the modelling principles also apply to discrete-time forms. 
+
+keywords:
+  - dynamic systems
+  - continuous time
+  - hierarchical modelling
+  - longitudinal data analysis
+  - affect dynamics
+  - ctsem
+  - lme4
+  - state-space models
+
+impact-statement: |-
+  This tutorial shows how psychological researchers can use R and the ctsem package to build and understand dynamic systems models while keeping the modelling assumptions visible. By working from theory to simulations, estimation, checking, and revision, we aim to facilitate the translation of theoretical concepts into empirical models and improve understanding of psychological processes and their interrelations over time.
+
+word-count: false
+floatsintext: true
+numbered-lines: false
+first-page: 1
+number-sections: false
+
+# --- references --------------------------------------------------------------
+
+bibliography: ctsemAffectiveDynamics.bib 
+link-citations: true 
+mask: false
+
+# --- localisation -------------------------------------------------------------
+
+lang: en
+language:
+  citation-last-author-separator: "and"
+no-ampersand-parenthetical: false
+
+# --- execution options -------------------------------------------------------
+
+execute:
+  fig-format: png
+  fig-dpi: 300
+  fig-height: 4
+  dev: png
+knitr:
+  opts_chunk:
+    R.options:
+      width: 65
+
+# --- output formats ----------------------------------------------------------
+
+format:
+  # apaquarto-html:
+  #   toc: true
+  #   toc-expand: true
+  #   embed-resources: true
+  #   self-contained-math: true
+  #   self-contained: true
+  #   code-fold: show
+  #   css: chunkbg.css
+  #   number_sections: true
+  #   max-width: 1400px
+  #   code-overflow: wrap
+  #   grid:                 # <-- body-width must be under grid
+  #     body-width: 1000px  # try 1000–1200px for readable text
+  #     margin-width: 300px # optional: give the TOC some room
+  #     gutter-width: 1.2rem
+  apaquarto-pdf:
+    documentmode: jou
+    font-size: 10pt
+    a4paper: true
+    keep-tex: true
+    include-in-header:
+      - text: |
+          \usepackage{nameref}
+          \newcommand*{\sectionfullref}[1]{%
+            \hyperref[#1]{Section: \nameref*{#1}}%
+          }
+          \newcommand*{\subsectionfullref}[1]{%
+            \hyperref[#1]{\nameref*{#1}}%
+          }
+          \makeatletter
+          \AtBeginDocument{%
+            \newif\if@inabstract
+            \pretocmd{\abstract}{\@inabstracttrue}{}{}
+            \apptocmd{\abstract}{\@inabstractfalse}{}{}
+            \let\apa@orig@section\section
+            \renewcommand\section{%
+              \@ifstar{\apa@orig@section*}{\apa@section@nostar}%
+            }
+            \newcommand{\apa@section@nostar}[1]{%
+              \if@inabstract
+                \begingroup
+                \def\Hy@writebookmark##1##2##3##4##5{}%
+                \apa@orig@section*{#1}%
+                \endgroup
+              \else
+                \apa@orig@section{#1}%
+              \fi
+            }
+          }
+          \newcommand{\invisiblesection}[2]{%
+          \phantomsection
+          \refstepcounter{section}%
+          \def\@currentlabelname{#1}%
+          \pdfbookmark[1]{#1}{#2-bookmark}%
+          \label{#2}%
+          }
+          \makeatother
+
+# --- misc --------------------------------------------------------------------
+
+editor: source
+editor_options:
+  chunk_output_type: console
+---
+
+
+
+
+
